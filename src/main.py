@@ -52,7 +52,7 @@ def main():
     with st.sidebar:
         st.title("🩺 About")
         st.markdown("---")
-        st.markdown("### 👨‍💻 Created by Harsh Gajjar")
+        st.markdown("### 👨‍💻 Created with ❤️ by Harsh Gajjar")
         st.markdown("#### 🔗 Connect with me")
         
         cols = st.columns(3)
