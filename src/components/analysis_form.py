@@ -6,14 +6,16 @@ from config.sample_data import SAMPLE_REPORT
 from config.app_config import MAX_UPLOAD_SIZE_MB
 
 def show_analysis_form():
-    # Set default value to "Upload PDF" when it's a new session
-    default_source = "Upload PDF"
+    # Initialize report source in session state for new sessions
+    if 'current_session' in st.session_state and 'report_source' not in st.session_state:
+        st.session_state.report_source = "Upload PDF"
     
     report_source = st.radio(
         "Choose report source",
         ["Upload PDF", "Use Sample PDF"],
-        index=0,  # 0 corresponds to "Upload PDF"
-        horizontal=True
+        index=0 if st.session_state.get('report_source') == "Upload PDF" else 1,
+        horizontal=True,
+        key='report_source'
     )
 
     pdf_contents = get_report_contents(report_source)
