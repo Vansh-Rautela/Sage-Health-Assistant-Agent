@@ -17,9 +17,9 @@ st.set_page_config(
 st.markdown("""
     <style>
         /* Hide form submission helper text */
-        div[data-testid="InputInstructions"] > span:nth-child(1) {
-            visibility: hidden;
-        }
+        # div[data-testid="InputInstructions"] > span:nth-child(1) {
+        #     visibility: hidden;
+        # }
     </style>
 """, unsafe_allow_html=True)
 
