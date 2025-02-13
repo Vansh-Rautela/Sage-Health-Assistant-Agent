@@ -25,6 +25,8 @@ AI Agent to analyze blood reports and provide detailed health insights.
 - Streamlit 1.30.0+
 - Supabase account
 - Groq API key
+- PDFPlumber
+- Python-magic-bin (Windows) or Python-magic (Linux/Mac)
 
 ## ⚙️ Configuration
 
@@ -34,6 +36,10 @@ Required environment variables (in `.streamlit/secrets.toml`):
 SUPABASE_URL = "your-supabase-url"
 SUPABASE_KEY = "your-supabase-key"
 GROQ_API_KEY = "your-groq-api-key"
+
+# Additional configurations
+[server]
+maxUploadSize = 20  # Maximum file upload size in MB
 ```
 
 ## 🚀 Installation
@@ -95,11 +101,13 @@ hia/
 
 ## 📊 Analysis Features
 
-- PDF blood report upload
-- Text extraction from PDFs
-- AI-powered analysis using LLaMA model
+- PDF blood report upload (up to 20MB)
+- Smart text extraction and validation
+- Automatic medical report detection
+- AI-powered comprehensive analysis
 - Daily analysis limit (15 per day)
 - Sample report option for testing
+- Detailed error handling for invalid files
 
 ## 💾 Data Management
 
@@ -129,6 +137,17 @@ hia/
 - Progress indicators
 - Error handling
 - Success notifications
+
+## 🔐 Security Features
+
+- Secure file type validation
+- PDF content validation
+- Rate limiting implementation
+- Session-based authentication
+- Automatic session timeout
+- Secure password requirements
+- Input sanitization
+- Error handling
 
 ## 👥 Contributing
 
