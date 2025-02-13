@@ -7,7 +7,7 @@ import re
 
 def show_login_page():
     if 'form_type' not in st.session_state:
-        st.session_state.form_type = 'login'
+        st.session_state.form_type = 'signup'  # Changed from 'login' to 'signup'
 
     st.markdown(f"""
         <div style='text-align: center; padding: 2rem;'>
