@@ -36,17 +36,20 @@ def validate_signup_fields(name, email, password, confirm_password):
     return True, None
 
 def validate_pdf_file(file):
-    """Validate PDF file type and size."""
-    try:
-        if not file.name.lower().endswith('.pdf'):
-            return False, "Invalid file type. Please upload a PDF file."
-            
-        if file.size > MAX_UPLOAD_SIZE_MB * 1024 * 1024:
-            return False, f"File size exceeds {MAX_UPLOAD_SIZE_MB}MB limit"
-            
-        return True, None
-    except Exception as e:
-        return False, f"Error validating file: {str(e)}"
+    """Validate PDF file size and type."""
+    if not file:
+        return False, "No file uploaded"
+        
+    # Check file size
+    file_size_mb = file.size / (1024 * 1024)
+    if file_size_mb > MAX_UPLOAD_SIZE_MB:
+        return False, f"File size ({file_size_mb:.1f}MB) exceeds the {MAX_UPLOAD_SIZE_MB}MB limit"
+        
+    # Check file type
+    if file.type != 'application/pdf':
+        return False, "Invalid file type. Please upload a PDF file"
+        
+    return True, None
 
 def validate_pdf_content(text):
     """Validate if the PDF content appears to be a medical report."""

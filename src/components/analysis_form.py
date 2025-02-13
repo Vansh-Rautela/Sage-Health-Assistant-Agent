@@ -3,6 +3,7 @@ from services.ai_service import generate_analysis
 from config.prompts import SPECIALIST_PROMPTS
 from utils.pdf_extractor import extract_text_from_pdf
 from config.sample_data import SAMPLE_REPORT
+from config.app_config import MAX_UPLOAD_SIZE_MB
 
 def show_analysis_form():
     # Set default value to "Upload PDF" when it's a new session
@@ -23,11 +24,17 @@ def show_analysis_form():
 def get_report_contents(report_source):
     if report_source == "Upload PDF":
         uploaded_file = st.file_uploader(
-            "Upload blood report PDF", 
+            f"Upload blood report PDF (Max {MAX_UPLOAD_SIZE_MB}MB)", 
             type=['pdf'],
-            help="Only PDF files containing medical reports are supported"
+            help=f"Maximum file size: {MAX_UPLOAD_SIZE_MB}MB. Only PDF files containing medical reports are supported"
         )
         if uploaded_file:
+            # Check file size before processing
+            file_size_mb = uploaded_file.size / (1024 * 1024)  # Convert to MB
+            if file_size_mb > MAX_UPLOAD_SIZE_MB:
+                st.error(f"File size ({file_size_mb:.1f}MB) exceeds the {MAX_UPLOAD_SIZE_MB}MB limit.")
+                return None
+                
             if uploaded_file.type != 'application/pdf':
                 st.error("Please upload a valid PDF file.")
                 return None
