@@ -98,7 +98,7 @@ hia/
 - PDF blood report upload
 - Text extraction from PDFs
 - AI-powered analysis using LLaMA model
-- Daily analysis limit (10 per day)
+- Daily analysis limit (15 per day)
 - Sample report option for testing
 
 ## 💾 Data Management
@@ -110,7 +110,7 @@ hia/
 
 ## 🎯 Rate Limiting
 
-- 10 analyses per day per user
+- 15 analyses per day per user
 - Counter resets daily
 - Session timeout after 30 minutes
 
