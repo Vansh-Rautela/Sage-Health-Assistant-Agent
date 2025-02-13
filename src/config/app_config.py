@@ -4,7 +4,7 @@ APP_DESCRIPTION = "Your AI-powered health report analysis assistant"
 APP_TAGLINE = "Discover a Healthier You with AI"
 
 # App settings
-MAX_UPLOAD_SIZE_MB = 10
+MAX_UPLOAD_SIZE_MB = 20
 MAX_PDF_PAGES = 50
 SESSION_TIMEOUT_MINUTES = 30
 ANALYSIS_DAILY_LIMIT = 10
