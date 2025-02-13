@@ -22,7 +22,7 @@ def show_footer(in_sidebar=False):
                 margin: 0;
                 opacity: 0.9;
             '>
-                Created with <span style='color: #FF4B4B;'>❤️</span> by 
+                Created by 
                 <a href='https://harshgajjar.vercel.app' 
                    target='_blank' 
                    style='
