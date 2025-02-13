@@ -4,7 +4,7 @@ from components.auth_pages import show_login_page
 from components.sidebar import show_sidebar
 from components.analysis_form import show_analysis_form
 from components.footer import show_footer
-from config.app_config import APP_NAME, APP_TAGLINE, MAX_UPLOAD_SIZE_MB
+from config.app_config import APP_NAME, APP_TAGLINE, APP_DESCRIPTION, APP_ICON
 
 # Must be the first Streamlit command
 st.set_page_config(
@@ -17,7 +17,8 @@ def show_welcome_screen():
     st.markdown(
         f"""
         <div style='text-align: center; padding: 50px;'>
-            <h2>Welcome to {APP_NAME}</h2>
+            <h1>{APP_ICON} {APP_NAME}</h1>
+            <h3>{APP_DESCRIPTION}</h3>
             <p style='font-size: 1.2em; color: #666;'>{APP_TAGLINE}</p>
             <p>Start by creating a new analysis session</p>
         </div>

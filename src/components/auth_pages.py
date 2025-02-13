@@ -1,6 +1,6 @@
 import streamlit as st
 from auth.session_manager import SessionManager
-from config.app_config import APP_NAME, APP_TAGLINE
+from config.app_config import APP_ICON, APP_NAME, APP_TAGLINE, APP_DESCRIPTION
 from utils.validators import validate_signup_fields
 import time
 import re
@@ -11,7 +11,8 @@ def show_login_page():
 
     st.markdown(f"""
         <div style='text-align: center; padding: 2rem;'>
-            <h1>🩺 {APP_NAME}</h1>
+            <h1>{APP_ICON} {APP_NAME}</h1>
+            <h3>{APP_DESCRIPTION}</h3>
             <p style='font-size: 1.2em; color: #666; margin-bottom: 1em;'>{APP_TAGLINE}</p>
             <h3>{("Welcome Back!" if st.session_state.form_type == 'login' else "Welcome!")}</h3>
         </div>
