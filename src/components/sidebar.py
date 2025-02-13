@@ -1,12 +1,13 @@
 import streamlit as st
 from auth.session_manager import SessionManager
 from components.footer import show_footer
+from config.app_config import ANALYSIS_DAILY_LIMIT
 
 def show_sidebar():
     with st.sidebar:
         st.title("💬 Chat Sessions")
         
-        if st.button("+ New Analysis Session"):
+        if st.button("+ New Analysis Session", use_container_width=True):
             if st.session_state.user and 'id' in st.session_state.user:
                 success, session = SessionManager.create_chat_session()
                 if success:
@@ -18,6 +19,34 @@ def show_sidebar():
                 st.error("Please log in again")
                 SessionManager.logout()
                 st.rerun()
+
+        # Add analysis counter
+        if 'analysis_count' not in st.session_state:
+            st.session_state.analysis_count = 0
+        
+        remaining = ANALYSIS_DAILY_LIMIT - st.session_state.analysis_count
+        st.markdown(
+            f"""
+            <div style='
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                background: rgba(100, 181, 246, 0.1);
+                margin: 0.5rem 0;
+                text-align: center;
+                font-size: 0.9em;
+            '>
+                <p style='margin: 0; color: #666;'>Daily Analysis Limit</p>
+                <p style='
+                    margin: 0.2rem 0 0 0;
+                    color: {"#1976D2" if remaining > 3 else "#FF4B4B"};
+                    font-weight: 500;
+                '>
+                    {remaining}/{ANALYSIS_DAILY_LIMIT} remaining
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
         st.markdown("---")
         show_session_list()
@@ -77,7 +106,6 @@ def render_session_item(session):
         
         # Show confirmation below if this session is being deleted
         if st.session_state.delete_confirmation == session_id:
-            # st.markdown("<div style='margin-top: 0.5em;'>", unsafe_allow_html=True)
             st.warning("Delete above session?")
             left_btn, right_btn = st.columns(2)
             with left_btn:
@@ -87,7 +115,6 @@ def render_session_item(session):
                 if st.button("No", key=f"cancel_delete_{session_id}", use_container_width=True):
                     st.session_state.delete_confirmation = None
                     st.rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
 
 def handle_delete_confirmation(session_id, current_session_id):
     if not session_id:

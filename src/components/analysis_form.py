@@ -5,9 +5,13 @@ from utils.pdf_extractor import extract_text_from_pdf
 from config.sample_data import SAMPLE_REPORT
 
 def show_analysis_form():
+    # Set default value to "Upload PDF" when it's a new session
+    default_source = "Upload PDF"
+    
     report_source = st.radio(
         "Choose report source",
         ["Upload PDF", "Use Sample PDF"],
+        index=0,  # 0 corresponds to "Upload PDF"
         horizontal=True
     )
 
@@ -18,9 +22,24 @@ def show_analysis_form():
 
 def get_report_contents(report_source):
     if report_source == "Upload PDF":
-        uploaded_file = st.file_uploader("Upload blood report PDF", type=['pdf'])
+        uploaded_file = st.file_uploader(
+            "Upload blood report PDF", 
+            type=['pdf'],
+            help="Only PDF files containing medical reports are supported"
+        )
         if uploaded_file:
+            if uploaded_file.type != 'application/pdf':
+                st.error("Please upload a valid PDF file.")
+                return None
+                
             pdf_contents = extract_text_from_pdf(uploaded_file)
+            if isinstance(pdf_contents, str) and (
+                pdf_contents.startswith(("File size exceeds", "Invalid file type", "Error validating")) or
+                pdf_contents.startswith("The uploaded file") or
+                "error" in pdf_contents.lower()
+            ):
+                st.error(pdf_contents)
+                return None
             with st.expander("View Extracted Report"):
                 st.text(pdf_contents)
             return pdf_contents
@@ -47,24 +66,35 @@ def handle_form_submission(patient_name, age, gender, pdf_contents):
         st.error("Please fill in all fields")
         return
 
+    # Check rate limit first, outside of spinner
+    can_analyze, error_msg = generate_analysis(None, None, check_only=True)
+    if not can_analyze:
+        st.error(error_msg)
+        st.stop()
+        return
+
     with st.spinner("Analyzing report..."):
-        # Save user message
+        # Save user message and proceed with analysis
         st.session_state.auth_service.save_chat_message(
             st.session_state.current_session['id'],
             f"Analyzing report for patient: {patient_name}"
         )
         
-        # Generate and save analysis
-        analysis = generate_analysis({
+        # Generate analysis
+        result = generate_analysis({
             "patient_name": patient_name,
             "age": age,
             "gender": gender,
             "report": pdf_contents
         }, SPECIALIST_PROMPTS["comprehensive_analyst"])
         
-        st.session_state.auth_service.save_chat_message(
-            st.session_state.current_session['id'],
-            analysis,
-            role='assistant'
-        )
-        st.rerun()
+        if result["success"]:
+            st.session_state.auth_service.save_chat_message(
+                st.session_state.current_session['id'],
+                result["content"],
+                role='assistant'
+            )
+            st.rerun()
+        else:
+            st.error(result["error"])
+            st.stop()

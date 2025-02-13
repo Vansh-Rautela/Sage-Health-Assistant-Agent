@@ -1,10 +1,10 @@
 import streamlit as st
 from auth.session_manager import SessionManager
-from components.auth_pages import show_login_page  # Updated import
+from components.auth_pages import show_login_page
 from components.sidebar import show_sidebar
 from components.analysis_form import show_analysis_form
-from components.footer import show_footer  # Add this import
-from config.app_config import APP_NAME, APP_TAGLINE
+from components.footer import show_footer
+from config.app_config import APP_NAME, APP_TAGLINE, MAX_UPLOAD_SIZE_MB
 
 # Must be the first Streamlit command
 st.set_page_config(
@@ -62,7 +62,7 @@ def main():
 
     if not SessionManager.is_authenticated():
         show_login_page()
-        show_footer()  # Show footer at bottom for login page
+        show_footer()
         return
 
     # Show user greeting at the top
@@ -78,8 +78,6 @@ def main():
         show_analysis_form()
     else:
         show_welcome_screen()
-    
-    # Remove footer from main content when logged in since it's in sidebar
 
 if __name__ == "__main__":
     main()
