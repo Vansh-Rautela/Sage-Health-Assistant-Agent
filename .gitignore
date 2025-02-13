@@ -1,5 +1,6 @@
 *.env
 .streamlit/secrets.toml
+.streamlit/config.toml
 # Python
 __pycache__/
 *.py[cod]
