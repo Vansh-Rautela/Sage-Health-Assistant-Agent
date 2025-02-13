@@ -22,6 +22,9 @@ class AuthService:
         except Exception as e:
             st.error(f"Failed to initialize services: {str(e)}")
             raise e
+        
+        # Add new method to validate token
+        self.validate_session_token()
 
     def validate_email(self, email):
         """Validate email format."""
@@ -79,23 +82,17 @@ class AuthService:
                 "password": password
             })
             
-            if (auth_response and auth_response.user):
-                user_query = self.supabase.table('users')\
-                    .select('*')\
-                    .eq('id', auth_response.user.id)\
-                    .execute()
-                
-                user_data = {
-                    'id': auth_response.user.id,
-                    'email': auth_response.user.email,
-                    'name': auth_response.user.user_metadata.get('name') or '',
-                    'created_at': auth_response.user.created_at
-                }
-                
-                if user_query.data and len(user_query.data) > 0:
-                    user_data['name'] = user_query.data[0].get('name', user_data['name'])
-                
+            if auth_response and auth_response.user:
+                # Get user data
+                user_data = self.get_user_data(auth_response.user.id)
+                if not user_data:
+                    return False, "User data not found"
+                    
+                # Store session info
+                st.session_state.auth_token = auth_response.session.access_token
+                st.session_state.user = user_data
                 return True, user_data
+                
             return False, "Invalid login response"
         except Exception as e:
             return False, str(e)
@@ -103,6 +100,10 @@ class AuthService:
     def sign_out(self):
         try:
             self.supabase.client.auth.sign_out()
+            # Clear session state
+            for key in ['auth_token', 'user', 'current_session']:
+                if key in st.session_state:
+                    del st.session_state[key]
             return True, None
         except Exception as e:
             return False, str(e)
@@ -180,3 +181,27 @@ class AuthService:
         except Exception as e:
             st.error(f"Failed to delete session: {str(e)}")
             return False, str(e)
+    
+    def validate_session_token(self):
+        """Validate existing session token on startup."""
+        try:
+            session = self.supabase.client.auth.get_session()
+            if session and session.access_token:
+                user = self.supabase.client.auth.get_user()
+                if user and user.user:
+                    return self.get_user_data(user.user.id)
+        except Exception:
+            return None
+        return None
+    
+    def get_user_data(self, user_id):
+        """Get user data from database."""
+        try:
+            response = self.supabase.table('users')\
+                .select('*')\
+                .eq('id', user_id)\
+                .single()\
+                .execute()
+            return response.data if response else None
+        except Exception:
+            return None

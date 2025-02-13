@@ -13,6 +13,9 @@ st.set_page_config(
     layout="wide"
 )
 
+# Initialize session state
+SessionManager.init_session()
+
 # Hide all Streamlit form-related elements
 st.markdown("""
     <style>

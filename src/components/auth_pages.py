@@ -50,7 +50,7 @@ def show_login_form():
         
         if st.form_submit_button("Login", use_container_width=True, type="primary"):
             if email and password:
-                success, error = SessionManager.login(email, password)
+                success, result = SessionManager.login(email, password)
                 if success:
                     # Show success message with spinner
                     with st.spinner("Logging in..."):
@@ -59,7 +59,7 @@ def show_login_form():
                         time.sleep(1)  # Brief pause to show message
                         st.rerun()
                 else:
-                    st.error(f"Login failed: {error}")
+                    st.error(f"Login failed: {result}")
             else:
                 st.error("Please enter both email and password")
 
