@@ -13,6 +13,16 @@ st.set_page_config(
     layout="wide"
 )
 
+# Hide all Streamlit form-related elements
+st.markdown("""
+    <style>
+        /* Hide form submission helper text */
+        div[data-testid="InputInstructions"] > span:nth-child(1) {
+            visibility: hidden;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 def show_welcome_screen():
     st.markdown(
         f"""
