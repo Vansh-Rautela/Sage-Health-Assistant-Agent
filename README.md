@@ -105,7 +105,7 @@ hia/
 
 - Secure storage using Supabase
 - Session-based analysis history
-- PDF size limit: 10MB
+- PDF size limit: 20MB
 - Maximum 50 pages per PDF
 
 ## 🎯 Rate Limiting
