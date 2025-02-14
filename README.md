@@ -11,18 +11,18 @@ AI Agent to analyze blood reports and provide detailed health insights.
 </p>
 
 <p align="center">
-  <a href="#🌟-features">Features</a> •
-  <a href="#🛠️-tech-stack">Tech Stack</a> •
-  <a href="#🚀-installation">Installation</a> •
-  <a href="#👥-contributing">Contributing</a> •
-  <a href="#🙋‍♂️-author">Author</a>
+  <a href="#features-">Features</a> •
+  <a href="#tech-stack-">Tech Stack</a> •
+  <a href="#installation-">Installation</a> •
+  <a href="#contributing-">Contributing</a> •
+  <a href="#author-">Author</a>
 </p>
 
 <p align="center">
   <a href="https://github.com/harshhh28/hia"><img src="https://raw.githubusercontent.com/harshhh28/hia/main/public/HIA_demo.gif" alt="Usage Demo"></a>
 </p>
 
-## 🌟 Features
+## Features 🌟
 
 - 🔒 Secure user authentication and session management
 - 📊 Blood report analysis using AI
@@ -31,7 +31,67 @@ AI Agent to analyze blood reports and provide detailed health insights.
 - 🎯 Rate limiting and usage tracking
 - 🎨 Modern, responsive UI
 
-## 🛠️ Tech Stack
+#### Authentication 🔐
+
+- Email/password-based authentication
+- Session timeout after 30 minutes of inactivity
+- Secure password requirements:
+  - Minimum 8 characters
+  - At least one uppercase letter
+  - At least one lowercase letter
+  - At least one number
+
+#### Analysis Features 📊
+
+- PDF blood report upload (up to 20MB)
+- Smart text extraction and validation
+- Automatic medical report detection
+- AI-powered comprehensive analysis
+- Daily analysis limit (15 per day)
+- Sample report option for testing
+- Detailed error handling for invalid files
+
+#### Data Management 💾
+
+- Secure storage using Supabase
+- Session-based analysis history
+- PDF size limit: 20MB
+- Maximum 50 pages per PDF
+
+#### Rate Limiting 🎯
+
+- 15 analyses per day per user
+- Counter resets daily
+- Session timeout after 30 minutes
+
+#### Session Management 🔄
+
+- Persistent user sessions
+- Automatic timeout
+- Multiple analysis sessions
+- Session history tracking
+
+#### UI Features 📱
+
+- Responsive design
+- Dark/Light mode support
+- Interactive sidebar navigation
+- Progress indicators
+- Error handling
+- Success notifications
+
+#### Security Features 🔐
+
+- Secure file type validation
+- PDF content validation
+- Rate limiting implementation
+- Session-based authentication
+- Automatic session timeout
+- Secure password requirements
+- Input sanitization
+- Error handling
+
+## Tech Stack 🛠️
 
 - **Frontend Framework**: Streamlit
 - **AI Integration**: Groq (LLaMA-3.3-70B)
@@ -39,7 +99,9 @@ AI Agent to analyze blood reports and provide detailed health insights.
 - **PDF Processing**: PDFPlumber
 - **Authentication**: Supabase Auth
 
-## 📋 Requirements
+## Installation 🚀
+
+#### Requirements 📋
 
 - Python 3.8+
 - Streamlit 1.30.0+
@@ -48,21 +110,7 @@ AI Agent to analyze blood reports and provide detailed health insights.
 - PDFPlumber
 - Python-magic-bin (Windows) or Python-magic (Linux/Mac)
 
-## ⚙️ Configuration
-
-Required environment variables (in `.streamlit/secrets.toml`):
-
-```toml
-SUPABASE_URL = "your-supabase-url"
-SUPABASE_KEY = "your-supabase-key"
-GROQ_API_KEY = "your-groq-api-key"
-
-# Additional configurations
-[server]
-maxUploadSize = 20  # Maximum file upload size in MB
-```
-
-## 🚀 Installation
+#### Getting Started 📝
 
 1. Clone the repository:
 
@@ -77,13 +125,21 @@ cd hia
 pip install -r requirements.txt
 ```
 
-3. Run the application:
+3. Required environment variables (in `.streamlit/secrets.toml`):
 
-```bash
-streamlit run src/main.py
+```toml
+SUPABASE_URL = "your-supabase-url"
+SUPABASE_KEY = "your-supabase-key"
+GROQ_API_KEY = "your-groq-api-key"
 ```
 
-## 📁 Project Structure
+4. Run the application:
+
+```bash
+streamlit run src\main.py
+```
+
+## Project Structure 📁
 
 ```
 hia/
@@ -109,74 +165,14 @@ hia/
 │       └── pdf_extractor.py   # PDF processing
 ```
 
-## 🔐 Authentication
-
-- Email/password-based authentication
-- Session timeout after 30 minutes of inactivity
-- Secure password requirements:
-  - Minimum 8 characters
-  - At least one uppercase letter
-  - At least one lowercase letter
-  - At least one number
-
-## 📊 Analysis Features
-
-- PDF blood report upload (up to 20MB)
-- Smart text extraction and validation
-- Automatic medical report detection
-- AI-powered comprehensive analysis
-- Daily analysis limit (15 per day)
-- Sample report option for testing
-- Detailed error handling for invalid files
-
-## 💾 Data Management
-
-- Secure storage using Supabase
-- Session-based analysis history
-- PDF size limit: 20MB
-- Maximum 50 pages per PDF
-
-## 🎯 Rate Limiting
-
-- 15 analyses per day per user
-- Counter resets daily
-- Session timeout after 30 minutes
-
-## 🔄 Session Management
-
-- Persistent user sessions
-- Automatic timeout
-- Multiple analysis sessions
-- Session history tracking
-
-## 📱 UI Features
-
-- Responsive design
-- Dark/Light mode support
-- Interactive sidebar navigation
-- Progress indicators
-- Error handling
-- Success notifications
-
-## 🔐 Security Features
-
-- Secure file type validation
-- PDF content validation
-- Rate limiting implementation
-- Session-based authentication
-- Automatic session timeout
-- Secure password requirements
-- Input sanitization
-- Error handling
-
-## 👥 Contributing
+## Contributing 👥
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📄 License
+## License 📄
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🙋‍♂️ Author
+## Author 🙋‍♂️
 
 Created by [Harsh Gajjar](https://harshgajjar.vercel.app)
