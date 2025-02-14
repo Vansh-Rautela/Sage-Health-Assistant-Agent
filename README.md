@@ -175,4 +175,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🙋‍♂️ Author
 
-Created by [Harsh Gajjar](https://harshgajjar.vercel.app)
+Created by <a href="https://harshgajjar.vercel.app" target="_blank">Harsh Gajjar</a>
