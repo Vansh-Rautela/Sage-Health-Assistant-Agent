@@ -11,11 +11,11 @@ AI Agent to analyze blood reports and provide detailed health insights.
 </p>
 
 <p align="center">
-  <a href="#features-">Features</a> •
-  <a href="#tech-stack-%EF%B8%8F">Tech Stack</a> •
-  <a href="#installation-">Installation</a> •
-  <a href="#contributing-">Contributing</a> •
-  <a href="#author-">Author</a>
+  <a href="#-features">Features</a> •
+  <a href="#%EF%B8%8F-tech-stack">Tech Stack</a> •
+  <a href="#-installation">Installation</a> •
+  <a href="#-contributing">Contributing</a> •
+  <a href="#%EF%B8%8F-author">Author</a>
 </p>
 
 <p align="center">
@@ -91,7 +91,7 @@ AI Agent to analyze blood reports and provide detailed health insights.
 - Input sanitization
 - Error handling
 
-## Tech Stack 🛠️
+## 🛠️ Tech Stack
 
 - **Frontend Framework**: Streamlit
 - **AI Integration**: Groq (LLaMA-3.3-70B)
@@ -139,7 +139,7 @@ GROQ_API_KEY = "your-groq-api-key"
 streamlit run src\main.py
 ```
 
-## Project Structure 📁
+## 📁 Project Structure
 
 ```
 hia/
