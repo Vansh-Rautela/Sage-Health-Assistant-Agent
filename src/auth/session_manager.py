@@ -1,20 +1,47 @@
 import streamlit as st
 from datetime import datetime, timedelta
+from config.app_config import SESSION_TIMEOUT_MINUTES
 
 class SessionManager:
     @staticmethod
     def init_session():
         """Initialize or validate session."""
+        # Clear all session state if it's a new browser session
+        if 'session_initialized' not in st.session_state:
+            SessionManager.clear_session_state()
+            st.session_state.session_initialized = True
+            
         if 'auth_service' not in st.session_state:
             from auth.auth_service import AuthService
             st.session_state.auth_service = AuthService()
         
-        # Try to restore session from token
-        if 'user' not in st.session_state:
+        # Check session timeout
+        if 'last_activity' in st.session_state:
+            idle_time = datetime.now() - st.session_state.last_activity
+            if idle_time > timedelta(minutes=SESSION_TIMEOUT_MINUTES):
+                SessionManager.clear_session_state()
+                st.error("Session expired. Please log in again.")
+                st.rerun()
+        
+        # Update last activity
+        st.session_state.last_activity = datetime.now()
+        
+        # Validate token and user data
+        if 'user' in st.session_state:
             user_data = st.session_state.auth_service.validate_session_token()
-            if user_data:
-                st.session_state.user = user_data
-    
+            if not user_data:
+                SessionManager.clear_session_state()
+                st.error("Invalid session. Please log in again.")
+                st.rerun()
+
+    @staticmethod
+    def clear_session_state():
+        """Clear all session state data."""
+        keys_to_keep = ['session_initialized']
+        for key in list(st.session_state.keys()):
+            if key not in keys_to_keep:
+                del st.session_state[key]
+
     @staticmethod
     def is_authenticated():
         """Check if user is authenticated."""
@@ -50,6 +77,7 @@ class SessionManager:
         """Logout user and clear session."""
         if 'auth_service' in st.session_state:
             st.session_state.auth_service.sign_out()
+        SessionManager.clear_session_state()
     
     @staticmethod
     def login(email, password):

@@ -23,8 +23,10 @@ class AuthService:
             st.error(f"Failed to initialize services: {str(e)}")
             raise e
         
-        # Add new method to validate token
-        self.validate_session_token()
+        # Validate session on initialization
+        if 'auth_token' in st.session_state:
+            if not self.validate_session_token():
+                self.sign_out()
 
     def validate_email(self, email):
         """Validate email format."""
@@ -77,6 +79,9 @@ class AuthService:
 
     def sign_in(self, email, password):
         try:
+            # Clear any existing session data first
+            self.sign_out()
+            
             auth_response = self.supabase.client.auth.sign_in_with_password({
                 "email": email,
                 "password": password
@@ -98,12 +103,11 @@ class AuthService:
             return False, str(e)
     
     def sign_out(self):
+        """Sign out and clear all session data."""
         try:
             self.supabase.client.auth.sign_out()
-            # Clear session state
-            for key in ['auth_token', 'user', 'current_session']:
-                if key in st.session_state:
-                    del st.session_state[key]
+            from auth.session_manager import SessionManager
+            SessionManager.clear_session_state()
             return True, None
         except Exception as e:
             return False, str(e)
@@ -186,13 +190,20 @@ class AuthService:
         """Validate existing session token on startup."""
         try:
             session = self.supabase.client.auth.get_session()
-            if session and session.access_token:
-                user = self.supabase.client.auth.get_user()
-                if user and user.user:
-                    return self.get_user_data(user.user.id)
+            if not session or not session.access_token:
+                return None
+                
+            # Verify token matches stored token
+            if session.access_token != st.session_state.get('auth_token'):
+                return None
+                
+            user = self.supabase.client.auth.get_user()
+            if not user or not user.user:
+                return None
+                
+            return self.get_user_data(user.user.id)
         except Exception:
             return None
-        return None
     
     def get_user_data(self, user_id):
         """Get user data from database."""
