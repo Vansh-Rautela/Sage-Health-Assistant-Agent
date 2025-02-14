@@ -2,6 +2,11 @@
 
 AI Agent to analyze blood reports and provide detailed health insights.
 
+## 🎥 Demo Video
+
+<img src="public/HIA_demo.gif" alt="demo video" autoplay loop muted playsinline>
+</img>
+
 ## 🌟 Features
 
 - 🔒 Secure user authentication and session management
