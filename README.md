@@ -22,7 +22,7 @@ AI Agent to analyze blood reports and provide detailed health insights.
   <a href="https://github.com/harshhh28/hia"><img src="https://raw.githubusercontent.com/harshhh28/hia/main/public/HIA_demo.gif" alt="Usage Demo"></a>
 </p>
 
-## Features 🌟
+## 🌟 Features
 
 - 🔒 Secure user authentication and session management
 - 📊 Blood report analysis using AI
@@ -99,7 +99,7 @@ AI Agent to analyze blood reports and provide detailed health insights.
 - **PDF Processing**: PDFPlumber
 - **Authentication**: Supabase Auth
 
-## Installation 🚀
+## 🚀 Installation
 
 #### Requirements 📋
 
@@ -165,14 +165,14 @@ hia/
 │       └── pdf_extractor.py   # PDF processing
 ```
 
-## Contributing 👥
+## 👥 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License 📄
+## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Author 🙋‍♂️
+## 🙋‍♂️ Author
 
 Created by [Harsh Gajjar](https://harshgajjar.vercel.app)
