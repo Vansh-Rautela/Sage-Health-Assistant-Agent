@@ -12,7 +12,7 @@ AI Agent to analyze blood reports and provide detailed health insights.
 
 <p align="center">
   <a href="#features-">Features</a> •
-  <a href="#tech-stack-">Tech Stack</a> •
+  <a href="#tech-stack-%EF%B8%8F">Tech Stack</a> •
   <a href="#installation-">Installation</a> •
   <a href="#contributing-">Contributing</a> •
   <a href="#author-">Author</a>
