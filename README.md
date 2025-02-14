@@ -1,11 +1,26 @@
-# HIA - Health Insights Agent
+# 🩺 HIA (Health Insights Agent)
 
 AI Agent to analyze blood reports and provide detailed health insights.
 
-## 🎥 Demo Video
+<p align="center">
+  <a href="https://github.com/harshhh28/hia/issues"><img src="https://img.shields.io/github/issues/harshhh28/hia"></a> 
+  <a href="https://github.com/harshhh28/hia/stargazers"><img src="https://img.shields.io/github/stars/harshhh28/hia"></a>
+  <a href="https://github.com/harshhh28/hia/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg">
+  </a>
+</p>
 
-<img src="public/HIA_demo.gif" alt="demo video" autoplay loop muted playsinline>
-</img>
+<p align="center">
+  <a href="#🌟-features">Features</a> •
+  <a href="#🛠️-tech-stack">Tech Stack</a> •
+  <a href="#🚀-installation">Installation</a> •
+  <a href="#👥-contributing">Contributing</a> •
+  <a href="#🙋‍♂️-author">Author</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/harshhh28/hia"><img src="https://raw.githubusercontent.com/harshhh28/hia/main/public/HIA_demo.gif" alt="Usage Demo"></a>
+</p>
 
 ## 🌟 Features
 
