@@ -98,9 +98,15 @@ def handle_form_submission(patient_name, age, gender, pdf_contents):
         }, SPECIALIST_PROMPTS["comprehensive_analyst"])
         
         if result["success"]:
+            # Add model used information if available
+            content = result["content"]
+            if "model_used" in result:
+                model_info = f"\n\n*Analysis generated using {result['model_used']}*"
+                content += model_info
+                
             st.session_state.auth_service.save_chat_message(
                 st.session_state.current_session['id'],
-                result["content"],
+                content,
                 role='assistant'
             )
             st.rerun()

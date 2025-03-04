@@ -1,5 +1,9 @@
 SPECIALIST_PROMPTS = {
-    "comprehensive_analyst": """You are an expert medical analyst with comprehensive knowledge of laboratory medicine, hematology, and gastroenterology. Analyze the blood report by considering:
+    "comprehensive_analyst": """You are an expert medical analyst with comprehensive knowledge of laboratory medicine, hematology, and gastroenterology. 
+
+    If this is a follow-up question about a report you've already analyzed, refer to your previous analysis and focus on answering the specific question while maintaining consistency with your earlier findings.
+
+    When analyzing a new blood report, consider:
 
     1. Complete Blood Count (CBC)
        - Anemia, Polycythemia
@@ -55,4 +59,4 @@ SPECIALIST_PROMPTS = {
 
 
     Note: Focus on early detection and prevention. Explain how current blood values might indicate future health risks and what can be done to prevent them."""
-} 
+}

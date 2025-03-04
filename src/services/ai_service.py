@@ -1,71 +1,36 @@
 import streamlit as st
-import groq
-from datetime import datetime, timedelta
-from config.app_config import ANALYSIS_DAILY_LIMIT
+from agents.analysis_agent import AnalysisAgent
 
 def init_analysis_state():
     """Initialize analysis-related session state variables."""
-    if 'analysis_count' not in st.session_state:
-        st.session_state.analysis_count = 0
-    if 'last_analysis' not in st.session_state:
-        st.session_state.last_analysis = datetime.now()
-    if 'analysis_limit' not in st.session_state:
-        st.session_state.analysis_limit = ANALYSIS_DAILY_LIMIT
+    if 'analysis_agent' not in st.session_state:
+        st.session_state.analysis_agent = AnalysisAgent()
 
 def check_rate_limit():
-    # Ensure state is initialized
+    # Ensure analysis agent is initialized
+    init_analysis_state()
+    return st.session_state.analysis_agent.check_rate_limit()
+
+def generate_analysis(data, system_prompt, check_only=False, session_id=None):
+    """Generate analysis if within rate limits."""
+    # Ensure analysis agent is initialized
     init_analysis_state()
     
-    # Calculate time until reset
-    time_until_reset = timedelta(days=1) - (datetime.now() - st.session_state.last_analysis)
-    hours, remainder = divmod(time_until_reset.seconds, 3600)
-    minutes, _ = divmod(remainder, 60)
-    
-    # Reset counter after 24 hours
-    if time_until_reset.days < 0:
-        st.session_state.analysis_count = 0
-        st.session_state.last_analysis = datetime.now()
-        return True, None
-    
-    # Check if limit reached
-    if st.session_state.analysis_count >= ANALYSIS_DAILY_LIMIT:
-        error_msg = f"Daily limit reached. Reset in {hours}h {minutes}m"
-        return False, error_msg
-    return True, None
-
-def generate_analysis(data, system_prompt, check_only=False):
-    """Generate analysis if within rate limits.
-    
-    Args:
-        data: The data to analyze
-        system_prompt: The prompt for the AI
-        check_only: If True, only check rate limit without generating analysis
-    """
-    can_analyze, error_msg = check_rate_limit()
-    if not can_analyze:
-        return {"success": False, "error": error_msg}
-    
+    # For check_only, we just need to check rate limits
     if check_only:
-        return can_analyze, error_msg
-        
-    try:
-        client = groq.Groq(api_key=st.secrets["GROQ_API_KEY"])
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": str(data)}
-            ],
-            temperature=0.7,
-            max_tokens=2000
-        )
-        
-        st.session_state.analysis_count += 1
-        st.session_state.last_analysis = datetime.now()
-        
-        return {
-            "success": True,
-            "content": completion.choices[0].message.content
-        }
-    except Exception as e:
-        return {"success": False, "error": f"Analysis failed: {str(e)}"}
+        return st.session_state.analysis_agent.check_rate_limit()
+    
+    # Get chat history if needed
+    # Don't pass chat_history for now as it's causing issues
+    # chat_history = None
+    # if session_id and 'auth_service' in st.session_state:
+    #     success, messages = st.session_state.auth_service.get_session_messages(session_id)
+    #     if success:
+    #         chat_history = messages
+    
+    # Call analyze_report without the chat_history parameter
+    return st.session_state.analysis_agent.analyze_report(
+        data=data,
+        system_prompt=system_prompt,
+        check_only=False
+    )

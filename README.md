@@ -24,77 +24,22 @@ AI Agent to analyze blood reports and provide detailed health insights.
 
 ## 🌟 Features
 
-- 🔒 Secure user authentication and session management
-- 📊 Blood report analysis using AI
-- 📁 PDF report upload and text extraction
-- 💾 Session-based analysis history
-- 🎯 Rate limiting and usage tracking
-- 🎨 Modern, responsive UI
-
-#### Authentication 🔐
-
-- Email/password-based authentication
-- Session timeout after 30 minutes of inactivity
-- Secure password requirements:
-  - Minimum 8 characters
-  - At least one uppercase letter
-  - At least one lowercase letter
-  - At least one number
-
-#### Analysis Features 📊
-
-- PDF blood report upload (up to 20MB)
-- Smart text extraction and validation
-- Automatic medical report detection
-- AI-powered comprehensive analysis
-- Daily analysis limit (15 per day)
-- Sample report option for testing
-- Detailed error handling for invalid files
-
-#### Data Management 💾
-
-- Secure storage using Supabase
-- Session-based analysis history
-- PDF size limit: 20MB
-- Maximum 50 pages per PDF
-
-#### Rate Limiting 🎯
-
-- 15 analyses per day per user
-- Counter resets daily
-- Session timeout after 30 minutes
-
-#### Session Management 🔄
-
-- Persistent user sessions
-- Automatic timeout
-- Multiple analysis sessions
-- Session history tracking
-
-#### UI Features 📱
-
-- Responsive design
-- Dark/Light mode support
-- Interactive sidebar navigation
-- Progress indicators
-- Error handling
-- Success notifications
-
-#### Security Features 🔐
-
-- Secure file type validation
-- PDF content validation
-- Rate limiting implementation
-- Session-based authentication
-- Automatic session timeout
-- Secure password requirements
-- Input sanitization
-- Error handling
+- Intelligent agent-based architecture with multi-model cascade system
+- In-context learning from previous analyses and knowledge base building
+- Medical report analysis with personalized health insights
+- PDF upload, validation and text extraction (up to 20MB)
+- Secure user authentication and session management
+- Session history with report analysis tracking
+- Modern, responsive UI with real-time feedback
 
 ## 🛠️ Tech Stack
 
 - **Frontend Framework**: Streamlit
-- **AI Integration**: Groq (LLaMA-3.3-70B)
+- **AI Integration**: Multi-model architecture via Groq
+  - Primary: LLaMA-3.3-70B-Versatile
+  - Secondary: LLaMA-3-8B-8192
+  - Tertiary: Mixtral-8x7B-32768
+  - Fallback: Gemma-7B-IT
 - **Database**: Supabase
 - **PDF Processing**: PDFPlumber
 - **Authentication**: Supabase Auth
@@ -160,6 +105,9 @@ hia/
 │   │   └── prompts.py         # AI prompts
 │   ├── services/              # Service integrations
 │   │   └── ai_service.py      # AI service integration
+│   ├── agents/                # Agent-based architecture components
+│   │   ├── agent_manager.py   # Agent management
+│   │   └── model_fallback.py  # Model fallback logic
 │   └── utils/                 # Utility functions
 │       ├── validators.py      # Input validation
 │       └── pdf_extractor.py   # PDF processing
