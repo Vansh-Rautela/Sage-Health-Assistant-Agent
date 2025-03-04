@@ -6,8 +6,12 @@ import time
 import re
 
 def show_login_page():
+    # IMPORTANT: Initialize form_type immediately, no code before this!
     if 'form_type' not in st.session_state:
-        st.session_state.form_type = 'signup'
+        st.session_state['form_type'] = 'login'  # Use dict-style access to be safer
+    
+    # From now on, form_type is guaranteed to exist
+    current_form = st.session_state['form_type']  # Use dict-style access for consistency
 
     # Hide form submission helper text
     st.markdown("""
@@ -24,23 +28,25 @@ def show_login_page():
             <h1>{APP_ICON} {APP_NAME}</h1>
             <h3>{APP_DESCRIPTION}</h3>
             <p style='font-size: 1.2em; color: #666; margin-bottom: 1em;'>{APP_TAGLINE}</p>
-            <h3>{("Welcome Back!" if st.session_state.form_type == 'login' else "Welcome!")}</h3>
+            <h3>{("Welcome Back!" if current_form == 'login' else "Welcome!")}</h3>
         </div>
     """, unsafe_allow_html=True)
 
     # Center the form
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.session_state.form_type == 'login':
+        # Use the stored current_form value
+        if current_form == 'login':
             show_login_form()
         else:
             show_signup_form()
         
         # Toggle button at bottom
         st.markdown("---")
-        toggle_text = "Don't have an account? Sign up" if st.session_state.form_type == 'login' else "Already have an account? Login"
+        toggle_text = "Don't have an account? Sign up" if current_form == 'login' else "Already have an account? Login"
         if st.button(toggle_text, use_container_width=True, type="secondary"):
-            st.session_state.form_type = 'signup' if st.session_state.form_type == 'login' else 'login'
+            # Toggle form type (use dict access for safety)
+            st.session_state['form_type'] = 'signup' if current_form == 'login' else 'login'
             st.rerun()
 
 def show_login_form():
