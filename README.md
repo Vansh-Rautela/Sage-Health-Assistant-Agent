@@ -86,6 +86,8 @@ The application requires the following tables in your Supabase database:
 
 You can use the SQL script provided at `public/database/db_script.sql` <a href="https://www.github.com/harshhh28/hia/blob/main/public/database/db_script.sql">[link]</a> to set up the required database schema.
 
+(PS: You can turn off the email confimation on signup in Supabase settings -> signup -> email)
+
 5. Run the application:
 
 ```bash
