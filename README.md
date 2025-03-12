@@ -78,7 +78,15 @@ SUPABASE_KEY = "your-supabase-key"
 GROQ_API_KEY = "your-groq-api-key"
 ```
 
-4. Run the application:
+4. Set up Supabase database schema:
+
+The application requires the following tables in your Supabase database:
+
+![Database Schema](https://raw.githubusercontent.com/harshhh28/hia/main/public/database/db_schema.png)
+
+You can use the SQL script provided at `public/database/db_script.sql` to set up the required database schema.
+
+5. Run the application:
 
 ```bash
 streamlit run src\main.py
