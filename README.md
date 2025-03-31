@@ -133,16 +133,9 @@ We appreciate all contributions, from reporting bugs and improving documentation
 
 Thanks to all the amazing contributors who have helped improve this project!
 
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/harshhh28">
-        <img src="https://github.com/harshhh28.png" width="80px" alt="Harsh Gajjar"/><br />
-        <sub><b>harshhh28</b></sub>
-      </a>
-    </td>
-  </tr>
-</table>
+| Avatar | Name | GitHub | Role | Contributions |
+|--------|------|--------|------|---------------|
+| <img src="https://github.com/harshhh28.png" width="50px" height="50px" alt="harshhh28"/> | Harsh Gajjar | [harshhh28](https://github.com/harshhh28) | Project Creator & Maintainer | Core implementation, Documentation |
 
 <!-- To future contributors: Your profile will be added here when your PR is merged! -->
 
