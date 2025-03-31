@@ -125,7 +125,26 @@ hia/
 
 ## 👥 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on how to submit pull requests, the development workflow, coding standards, and more.
+
+We appreciate all contributions, from reporting bugs and improving documentation to implementing new features.
+
+## 👨‍💻 Contributors
+
+Thanks to all the amazing contributors who have helped improve this project!
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/harshhh28">
+        <img src="https://github.com/harshhh28.png" width="80px" alt="Harsh Gajjar"/><br />
+        <sub><b>harshhh28</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- To future contributors: Your profile will be added here when your PR is merged! -->
 
 ## 📄 License
 
