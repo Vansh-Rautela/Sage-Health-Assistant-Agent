@@ -21,25 +21,25 @@ class ModelManager:
     MODEL_CONFIG = {
         ModelTier.PRIMARY: {
             "provider": "groq",
-            "model": "llama-3.3-70b-versatile",
+            "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
             "max_tokens": 2000,
             "temperature": 0.7
         },
         ModelTier.SECONDARY: {
             "provider": "groq", 
-            "model": "llama-3-8b-8192",
+            "model": "llama-3.3-70b-versatile",
             "max_tokens": 2000,
             "temperature": 0.7
         },
         ModelTier.TERTIARY: {
             "provider": "groq",
-            "model": "mixtral-8x7b-32768",
+            "model": "llama-3.1-8b-instant",
             "max_tokens": 2000, 
             "temperature": 0.7
         },
         ModelTier.FALLBACK: {
             "provider": "groq",
-            "model": "gemma-7b-it",
+            "model": "llama3-70b-8192",
             "max_tokens": 2000,
             "temperature": 0.7
         }
