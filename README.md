@@ -36,10 +36,10 @@ AI Agent to analyze blood reports and provide detailed health insights.
 
 - **Frontend Framework**: Streamlit
 - **AI Integration**: Multi-model architecture via Groq
-  - Primary: LLaMA-3.3-70B-Versatile
-  - Secondary: LLaMA-3-8B-8192
-  - Tertiary: Mixtral-8x7B-32768
-  - Fallback: Gemma-7B-IT
+  - Primary: meta-llama/llama-4-maverick-17b-128e-instruct
+  - Secondary: llama-3.3-70b-versatile
+  - Tertiary: llama-3.1-8b-instant
+  - Fallback: llama3-70b-8192
 - **Database**: Supabase
 - **PDF Processing**: PDFPlumber
 - **Authentication**: Supabase Auth
