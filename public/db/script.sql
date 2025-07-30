@@ -1,6 +1,6 @@
 -- Create users table
 CREATE TABLE users (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email TEXT NOT NULL,
     name TEXT,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
@@ -8,7 +8,7 @@ CREATE TABLE users (
 
 -- Create chat_sessions table
 CREATE TABLE chat_sessions (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
     title TEXT,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -17,7 +17,7 @@ CREATE TABLE chat_sessions (
 
 -- Create chat_messages table
 CREATE TABLE chat_messages (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     session_id UUID NOT NULL,
     content TEXT,
     role TEXT,
