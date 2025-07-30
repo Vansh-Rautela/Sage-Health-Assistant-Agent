@@ -143,7 +143,7 @@ Thanks to all the amazing contributors who have helped improve this project!
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/harshhh28/hia/blob/main/LICENSE) file for details.
 
 ## 🙋‍♂️ Author
 
