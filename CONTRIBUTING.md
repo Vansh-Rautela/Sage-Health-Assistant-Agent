@@ -1,26 +1,31 @@
-# Contributing to HIA (Health Insights Agent)
+# Contributing to HIA (Health Insights Agent) 🩺
 
 Thank you for considering contributing to HIA! This document provides guidelines and instructions to help you get started.
 
 ## Table of Contents
 - [Code of Conduct](#code-of-conduct)
 - [Getting Started](#getting-started)
-  - [Development Environment Setup](#development-environment-setup)
-  - [Project Structure](#project-structure)
+- [Development Environment Setup](#development-environment-setup)
 - [Development Workflow](#development-workflow)
-  - [Branching Strategy](#branching-strategy)
-  - [Commit Guidelines](#commit-guidelines)
-  - [Pull Request Process](#pull-request-process)
 - [Coding Standards](#coding-standards)
-- [Testing](#testing)
+- [Testing Guidelines](#testing-guidelines)
 - [Documentation](#documentation)
-- [Issue Reporting](#issue-reporting)
+- [Security](#security)
 
 ## Code of Conduct
 
-Please be respectful and considerate of others when contributing to this project. We welcome contributions from everyone regardless of level of experience, gender, gender identity and expression, sexual orientation, disability, personal appearance, body size, race, ethnicity, age, religion, or nationality.
+Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md). We aim to foster an inclusive and respectful community.
 
 ## Getting Started
+
+### Prerequisites
+
+- Python 3.8+
+- Streamlit 1.30.0+ 
+- Supabase account
+- Groq API key
+- PDFPlumber
+- Python-magic-bin (Windows) or Python-magic (Linux/Mac)
 
 ### Development Environment Setup
 
@@ -36,98 +41,120 @@ Please be respectful and considerate of others when contributing to this project
    ```
 
 3. **Configure environment variables**:
-   Create a `.streamlit/secrets.toml` file with the following variables:
+   Create `.streamlit/secrets.toml`:
    ```toml
    SUPABASE_URL = "your-supabase-url"
    SUPABASE_KEY = "your-supabase-key"
    GROQ_API_KEY = "your-groq-api-key"
    ```
 
-4. **Set up Supabase database**:
-   - Use the SQL script provided at `public/db/script.sql` to set up the required schema
-   - Optional: Turn off email confirmation on signup in Supabase settings
+4. **Set up database**:
+   Execute the SQL script in [public/db/script.sql](public/db/script.sql)
 
 5. **Run the application**:
    ```bash
    streamlit run src/main.py
    ```
 
-### Project Structure
-
-Familiarize yourself with the project structure:
-```
-hia/
-├── src/
-│   ├── main.py                 # Application entry point
-│   ├── auth/                   # Authentication related modules
-│   ├── components/             # UI Components
-│   ├── config/                 # Configuration files
-│   ├── services/               # Service integrations
-│   ├── agents/                 # Agent-based architecture components
-│   └── utils/                  # Utility functions
-```
-
 ## Development Workflow
 
 ### Branching Strategy
 
-1. Create a new branch for your feature or bugfix:
+- `main`: Production-ready code
+- `feature/*`: New features
+- `fix/*`: Bug fixes
+- `docs/*`: Documentation updates
+
+### Git Workflow
+
+1. **Create a branch**:
    ```bash
    git checkout -b feature/your-feature-name
    # or
-   git checkout -b fix/your-bugfix-name
+   git checkout -b fix/your-bug-fix
    ```
 
-2. Keep your branch updated with the main branch:
+2. **Make your changes**
+3. **Write commit messages**:
+   ```
+   feat: Add new blood analysis component
+   
+   - Implement report analysis visualization
+   - Add validation for blood test values
+   - Update documentation
+   ```
+
+4. **Push changes**:
    ```bash
-   git fetch origin
-   git rebase origin/main
+   git push origin feature/your-feature-name
    ```
 
-### Commit Guidelines
+5. **Create a Pull Request**
 
-- Use clear, descriptive commit messages
-- Start with a verb in the present tense (e.g., "Add feature" not "Added feature")
-- Reference issue numbers when applicable (e.g., "Fix #123: Update PDF validation")
+### Pull Request Guidelines
 
-### Pull Request Process
-
-1. Ensure your code follows the coding standards
-2. Update documentation if needed
-3. Make sure all tests pass
-4. Create a pull request with a clear title and description
-5. Link any relevant issues
-6. Wait for maintainers to review your PR
+- Fill out the PR template completely
+- Reference any related issues
+- Include screenshots for UI changes
+- Update documentation if needed
+- Add tests for new functionality
 
 ## Coding Standards
 
-- Follow Python PEP 8 style guide
-- Use meaningful variable and function names
-- Include docstrings for functions and classes
-- Keep functions focused on a single responsibility
-- Organize imports alphabetically within their groups
+### Python Style Guide
 
-## Testing
+- Follow [PEP 8](https://peps.python.org/pep-0008/)
+- Use type hints for function parameters
+- Maximum line length: 88 characters
+- Use docstrings for classes and functions
 
-- Test your changes across different environments if possible
+### Code Organization
+
+```python
+# Imports
+from typing import Optional
+import streamlit as st
+
+# Constants
+MAX_UPLOAD_SIZE = 20
+
+# Classes/Functions
+class AnalysisAgent:
+    """Agent for analyzing medical reports."""
+    
+    def __init__(self) -> None:
+        """Initialize the analysis agent."""
+        self.model = None
+```
+
+## Testing Guidelines
+
+1. **Test Coverage**
+   - Unit tests for utilities and services
+   - Integration tests for major features
+   - UI component tests
+
+2. **Running Tests**
+   ```bash
+   python -m pytest tests/
+   ```
 
 ## Documentation
 
-- Update the README.md if you add or change features
-- Document functions and classes with proper docstrings
-- Keep comments up-to-date with code changes
+- Update README.md for new features
+- Add docstrings to new functions/classes
+- Include example usage where appropriate
+- Document environment variables
+- Keep API documentation current
 
-## Issue Reporting
+## Security
 
-When reporting issues, please include:
-
-1. Description of the issue
-2. Steps to reproduce
-3. Expected behavior
-4. Actual behavior
-5. Environment details (OS, Python version, etc.)
-6. Screenshots if applicable
+- Never commit sensitive data
+- Follow secure coding practices
+- Validate all user inputs
+- Report security issues privately
+- Follow the [Security Policy](SECURITY.md)
 
 ---
 
-Thank you for contributing to HIA! Your efforts help make this project better for everyone. 
+We appreciate your contributions to making HIA better! If you have questions, feel free to open an issue or contact the maintainers.
