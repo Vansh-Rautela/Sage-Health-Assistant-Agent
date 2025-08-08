@@ -29,17 +29,12 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# --- Robust CORS Configuration ---
-# Get the Vercel URL from an environment variable for flexibility.
-VERCEL_FRONTEND_URL = os.environ.get("VERCEL_FRONTEND_URL")
-
+# --- THIS IS THE FIX: Hardcoded CORS Configuration ---
+# We have removed the environment variable and directly added your Vercel URL.
 origins = [
-    "http://localhost:3000",
-    "https://sage-health-assistant-agent.vercel.app/",  # For local development
+    "http://localhost:3000",  # For local development
+    "https://sage-health-assistant-agent-4epiv6kn3-vansh-rautelas-projects.vercel.app" # Your deployed frontend
 ]
-# Add the Vercel URL to the list only if it's set
-if VERCEL_FRONTEND_URL:
-    origins.append(VERCEL_FRONTEND_URL)
 
 app.add_middleware(
     CORSMiddleware,
@@ -48,6 +43,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# --- END OF FIX ---
 
 # --- Service Instances ---
 auth_service = AuthService()
