@@ -6,7 +6,7 @@ import AuthLayout from '@/components/auth/auth-layout'
 import LoginForm from '@/components/auth/login-form'
 import SignupForm from '@/components/auth/signup-form'
 
-const API_URL = 'http://localhost:8000'; // Your FastAPI backend URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL as string; // <-- use env var
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -50,19 +50,19 @@ export default function AuthPage() {
     setIsLoading(true);
     setError(null);
     try {
-        const response = await fetch(`${API_URL}/signup`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password }),
-        });
+      const response = await fetch(`${API_URL}/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-        if (!response.ok) {
-            const errData = await response.json();
-            throw new Error(errData.detail || 'Signup failed');
-        }
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.detail || 'Signup failed');
+      }
 
-        // Automatically log the user in after successful signup
-        await handleLogin(email, password);
+      // Automatically log the user in after successful signup
+      await handleLogin(email, password);
 
     } catch (error: any) {
       setError(error.message);
