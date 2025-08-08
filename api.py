@@ -30,8 +30,8 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",                  # Local dev
-        "https://sage-frontend.vercel.app"        # Production frontend on Vercel
+        "http://localhost:3000",
+        "https://sage-health-assistant-agent-4epiv6kn3-vansh-rautelas-projects.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
