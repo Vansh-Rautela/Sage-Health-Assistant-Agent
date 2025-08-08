@@ -29,7 +29,7 @@ export default function AuthPage() {
 
       if (!response.ok) {
         const errData = await response.json();
-        throw new Error(errData.detail || 'Login failed');
+        throw new Error(errData.detail || 'Login failed. Have you confirmed your email?');
       }
 
       const data = await response.json();
