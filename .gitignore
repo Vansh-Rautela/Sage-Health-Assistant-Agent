@@ -46,14 +46,10 @@ coverage.xml
 *.cover
 
 # -------------------------------
-# 🟩 Node.js / npm
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-package-lock.json
-yarn.lock
+# Node.js / Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/build/
 
 # Build Output (e.g. Vite, Next.js)
 .next/
