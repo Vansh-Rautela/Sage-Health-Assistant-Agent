@@ -44,13 +44,16 @@ htmlcov/
 .pytest_cache/
 coverage.xml
 *.cover
+# .gitignore
 
-# -------------------------------
 # Node.js / Frontend
 frontend/node_modules/
 frontend/.next/
 frontend/build/
 
+# Python
+*.env
+.streamlit/secrets.toml
 # Build Output (e.g. Vite, Next.js)
 .next/
 out/
