@@ -6,8 +6,7 @@ import AuthLayout from '@/components/auth/auth-layout'
 import LoginForm from '@/components/auth/login-form'
 import SignupForm from '@/components/auth/signup-form'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
