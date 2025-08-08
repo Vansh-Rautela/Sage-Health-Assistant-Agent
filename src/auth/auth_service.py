@@ -1,139 +1,121 @@
-import os
-import re
-from datetime import datetime
-from supabase import create_client, Client
-import logging
+'use client'
 
-# Configure basic logging to help with future debugging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import AuthLayout from '@/components/auth/auth-layout'
+import LoginForm from '@/components/auth/login-form'
+import SignupForm from '@/components/auth/signup-form'
 
-class AuthService:
-    def __init__(self):
-        """
-        Initializes the AuthService, connecting to Supabase using credentials
-        from environment variables loaded from the .env file.
-        """
-        try:
-            url = os.environ.get("SUPABASE_URL")
-            key = os.environ.get("SUPABASE_KEY")
-            if not url or not key:
-                raise ValueError("Supabase URL and Key must be set in the .env file")
-            self.supabase: Client = create_client(url, key)
-            logging.info("AuthService initialized and Supabase client created successfully.")
-        except Exception as e:
-            logging.error(f"FATAL: Failed to initialize Supabase client: {e}")
-            raise
+const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
-    def sign_up(self, email, password, name):
-        """
-        Signs up a new user. The user profile is created automatically in the 
-        public.users table by a database trigger.
-        """
-        try:
-            res = self.supabase.auth.sign_up({
-                "email": email, 
-                "password": password, 
-                "options": {"data": {"name": name}}
-            })
-            if not res.user:
-                return False, "Failed to create user in auth schema"
-            
-            # The database trigger handles creating the public user profile.
-            # We just return the user info upon successful auth creation.
-            return True, {"id": res.user.id, "email": res.user.email, "name": name}
-        except Exception as e:
-            error_msg = str(e).lower()
-            if "duplicate key value" in error_msg or "already registered" in error_msg:
-                return False, "Email already registered"
-            return False, f"Sign up failed: {str(e)}"
+export default function AuthPage() {
+  const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // --- THIS IS THE FIX: New state to handle the success message ---
+  const [signupSuccess, setSignupSuccess] = useState(false);
+  // --- END OF FIX ---
+  const router = useRouter();
 
-    def sign_in(self, email, password):
-        """Signs in a user and returns their data along with a session token."""
-        try:
-            res = self.supabase.auth.sign_in_with_password({"email": email, "password": password})
-            if not res.user or not res.session:
-                return False, "Invalid login credentials"
+  const handleLogin = async (email: string, password: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-            user_data = self.get_user_data(res.user.id)
-            if not user_data:
-                # This handles the rare case where the db trigger is slow.
-                import time
-                time.sleep(1)
-                user_data = self.get_user_data(res.user.id)
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.detail || 'Login failed. Have you confirmed your email?');
+      }
 
-            if not user_data:
-                return False, "User data not found. Please ensure your account is confirmed."
+      const data = await response.json();
+      localStorage.setItem('hiaUser', JSON.stringify(data.user));
+      localStorage.setItem('hiaToken', data.token);
+      
+      router.push('/dashboard');
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-            # Attach the token for the frontend to store
-            user_data["token"] = res.session.access_token
-            return True, user_data
-        except Exception:
-            return False, "Invalid login credentials"
+  const handleSignup = async (name: string, email: string, password: string, confirmPassword: string) => {
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
 
-    def get_user_data(self, user_id):
-        """Retrieves user profile data from the public 'users' table."""
-        try:
-            response = self.supabase.table('users').select('*').eq('id', user_id).single().execute()
-            return response.data if response.data else None
-        except Exception as e:
-            logging.error(f"Error fetching user data for {user_id}: {e}")
-            return None
+    setIsLoading(true);
+    setError(null);
+    setSignupSuccess(false);
+    try {
+      const response = await fetch(`${API_URL}/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-    def create_session(self, user_id, title=None):
-        """Creates a new chat session for a given user."""
-        try:
-            current_time = datetime.now()
-            default_title = f"{current_time.strftime('%d-%m-%Y')} | {current_time.strftime('%H:%M:%S')}"
-            session_data = {
-                'user_id': user_id,
-                'title': title or default_title,
-                'created_at': current_time.isoformat()
-            }
-            result = self.supabase.table('chat_sessions').insert(session_data).execute()
-            return True, result.data[0] if result.data else None
-        except Exception as e:
-            logging.error(f"Error creating session for user {user_id}: {e}")
-            return False, str(e)
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.detail || 'Signup failed');
+      }
 
-    def get_user_sessions(self, user_id):
-        """Retrieves all chat sessions for a given user."""
-        try:
-            result = self.supabase.table('chat_sessions').select('*').eq('user_id', user_id).order('created_at', desc=True).execute()
-            return True, result.data
-        except Exception as e:
-            logging.error(f"Error fetching sessions for user {user_id}: {e}")
-            return False, []
+      // --- THIS IS THE FIX: Show success message instead of auto-login ---
+      setSignupSuccess(true);
+      // --- END OF FIX ---
 
-    def save_chat_message(self, session_id, content, role='user'):
-        """Saves a chat message to a specific session."""
-        try:
-            message_data = {
-                'session_id': session_id,
-                'content': content,
-                'role': role,
-                'created_at': datetime.now().isoformat()
-            }
-            result = self.supabase.table('chat_messages').insert(message_data).execute()
-            return True, result.data[0] if result.data else None
-        except Exception as e:
-            logging.error(f"Error saving chat message for session {session_id}: {e}")
-            return False, str(e)
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    def get_session_messages(self, session_id):
-        """Retrieves all messages for a specific session."""
-        try:
-            result = self.supabase.table('chat_messages').select('*').eq('session_id', session_id).order('created_at').execute()
-            return True, result.data
-        except Exception as e:
-            logging.error(f"Error fetching messages for session {session_id}: {e}")
-            return False, []
+  // --- THIS IS THE FIX: New component to show the verification message ---
+  if (signupSuccess) {
+    return (
+      <AuthLayout title="Check Your Email">
+        <div className="text-center">
+          <p className="text-lg font-bold text-gray-700">
+            A confirmation link has been sent to your email address.
+          </p>
+          <p className="mt-4">Please click the link to verify your account before logging in.</p>
+          <button
+            onClick={() => {
+              setSignupSuccess(false);
+              setIsLogin(true);
+            }}
+            className="w-full neo-button mt-6 py-4 px-6"
+          >
+            Back to Login
+          </button>
+        </div>
+      </AuthLayout>
+    );
+  }
+  // --- END OF FIX ---
 
-    def delete_session(self, session_id):
-        """Deletes a session and all associated messages."""
-        try:
-            self.supabase.table('chat_messages').delete().eq('session_id', session_id).execute()
-            self.supabase.table('chat_sessions').delete().eq('id', session_id).execute()
-            return True, None
-        except Exception as e:
-            logging.error(f"Error deleting session {session_id}: {e}")
-            return False, str(e)
+  return (
+    <AuthLayout title={isLogin ? 'Welcome Back!' : 'Welcome!'}>
+      {isLogin ? (
+        <LoginForm
+          onToggleForm={() => setIsLogin(false)}
+          onLogin={handleLogin}
+          isLoading={isLoading}
+        />
+      ) : (
+        <SignupForm
+          onToggleForm={() => setIsLogin(true)}
+          onSignup={handleSignup}
+          isLoading={isLoading}
+        />
+      )}
+      {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+    </AuthLayout>
+  );
+}

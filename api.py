@@ -25,21 +25,19 @@ app = FastAPI(
     description="API for analyzing medical reports and managing user sessions.",
     version="1.0.0",
 )
+# Get the Vercel URL from an environment variable for flexibility
+VERCEL_FRONTEND_URL = os.environ.get("VERCEL_FRONTEND_URL", "http://localhost:3000")
 
-# --- CORS Configuration ---
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-    "http://localhost:3000",
-    "https://sage-health-assistant-agent-4epiv6kn3-vansh-rautelas-projects.vercel.app",
-    "https://sage-health-assistant-agent.vercel.app",   
+        "http://localhost:3000",
+        VERCEL_FRONTEND_URL 
     ],
-
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # --- Service Instances ---
 auth_service = AuthService()
 analysis_agent = AnalysisAgent()

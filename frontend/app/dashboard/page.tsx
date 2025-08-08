@@ -8,7 +8,7 @@ import AnalysisForm from '@/components/dashboard/analysis-form'
 import ChatView from '@/components/dashboard/chat-view'
 import RiskScoreDisplay from '@/components/dashboard/risk-score-display'
 
-const API_URL = 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
 // --- Interfaces ---
 interface User { id: string; name: string; email: string; }
@@ -29,6 +29,12 @@ export default function DashboardPage() {
   const [analysisCount, setAnalysisCount] = useState(15);
   const [riskData, setRiskData] = useState<RiskData | null>(null);
 
+  const handleLogout = () => {
+      localStorage.removeItem('hiaUser');
+      localStorage.removeItem('hiaToken');
+      router.push('/auth');
+  };
+
   useEffect(() => {
     const storedUser = localStorage.getItem('hiaUser');
     if (storedUser) {
@@ -36,13 +42,28 @@ export default function DashboardPage() {
       setUser(parsedUser);
       fetchSessions(parsedUser.id);
     } else {
-      router.push('/auth');
+      handleLogout(); // Redirect to login if no user
     }
-  }, [router]);
+  }, []); // We can remove router from dependency array as it's stable
 
   const fetchSessions = async (userId: string) => {
     try {
-      const response = await fetch(`${API_URL}/sessions/${userId}`);
+      const token = localStorage.getItem('hiaToken');
+      const response = await fetch(`${API_URL}/sessions/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}` // Send the token for authentication
+        }
+      });
+
+      // --- THIS IS THE FIX ---
+      // If the token is invalid, the server will respond with a 401.
+      // We catch this and log the user out.
+      if (response.status === 401) {
+        handleLogout();
+        return;
+      }
+      // --- END OF FIX ---
+      
       if (!response.ok) throw new Error("Failed to fetch sessions");
       const data = await response.json();
       setSessions(data);
@@ -51,6 +72,7 @@ export default function DashboardPage() {
     }
   };
 
+  // (The rest of your handler functions: handleNewSession, handleSelectSession, etc., remain the same)
   const handleNewSession = async () => {
     if (!user) return;
     setIsLoading(true);
@@ -191,12 +213,6 @@ export default function DashboardPage() {
     }
   };
   
-  const handleLogout = () => {
-      localStorage.removeItem('hiaUser');
-      localStorage.removeItem('hiaToken');
-      router.push('/auth');
-  };
-
   const renderMainContent = () => {
     switch (viewState) {
       case 'welcome':
