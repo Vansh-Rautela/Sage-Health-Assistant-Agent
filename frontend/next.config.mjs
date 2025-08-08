@@ -1,3 +1,6 @@
+// next.config.mjs
+import path from 'path';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -9,6 +12,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-}
+  webpack: (config) => {
+    config.resolve.alias['@'] = path.resolve(__dirname);
+    return config;
+  },
+};
 
-export default nextConfig
+export default nextConfig;
