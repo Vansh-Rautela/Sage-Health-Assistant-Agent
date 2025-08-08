@@ -29,16 +29,11 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# --- THIS IS THE FIX: Hardcoded CORS Configuration ---
-# We have removed the environment variable and directly added your Vercel URL.
-origins = [
-    "http://localhost:3000",  # For local development
-    "https://sage-health-assistant-agent-4epiv6kn3-vansh-rautelas-projects.vercel.app" # Your deployed frontend
-]
-
+# --- THIS IS THE FIX: Allow all origins to resolve the CORS issue ---
+# This is a robust way to fix the "Failed to fetch" error for now.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # Allows all domains
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
