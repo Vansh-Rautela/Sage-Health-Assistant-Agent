@@ -34,7 +34,8 @@ app = FastAPI(
 VERCEL_FRONTEND_URL = os.environ.get("VERCEL_FRONTEND_URL")
 
 origins = [
-    "http://localhost:3000",  # For local development
+    "http://localhost:3000",
+    "https://sage-health-assistant-agent.vercel.app/",  # For local development
 ]
 # Add the Vercel URL to the list only if it's set
 if VERCEL_FRONTEND_URL:
