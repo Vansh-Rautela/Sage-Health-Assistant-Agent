@@ -26,14 +26,18 @@ app = FastAPI(
     version="1.0.0",
 )
 # Get the Vercel URL from an environment variable for flexibility
-VERCEL_FRONTEND_URL = os.environ.get("VERCEL_FRONTEND_URL", "http://localhost:3000")
+VERCEL_FRONTEND_URL = os.environ.get("VERCEL_FRONTEND_URL")
+
+origins = [
+    "http://localhost:3000",  # For local development
+]
+# Add the Vercel URL to the list if it's set
+if VERCEL_FRONTEND_URL:
+    origins.append(VERCEL_FRONTEND_URL)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        VERCEL_FRONTEND_URL 
-    ],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
