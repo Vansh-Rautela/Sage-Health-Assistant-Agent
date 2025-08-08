@@ -1,28 +1,22 @@
 import pdfplumber
-import streamlit as st
-from config.app_config import MAX_PDF_PAGES
-from utils.validators import validate_pdf_file, validate_pdf_content
+# --- THE FIX: Changed relative imports to absolute from the project root ---
+from src.utils.validators import validate_pdf_content
+from src.config.app_config import MAX_PDF_PAGES
+# --- END OF FIX ---
 
 def extract_text_from_pdf(pdf_file):
-    """Extract and validate text from PDF file."""
+    """Extract and validate text from a PDF file stream."""
     try:
-        # Validate file first
-        is_valid, error = validate_pdf_file(pdf_file)
-        if not is_valid:
-            return error
-
         text = ""
         with pdfplumber.open(pdf_file) as pdf:
             if len(pdf.pages) > MAX_PDF_PAGES:
                 return f"PDF exceeds maximum page limit of {MAX_PDF_PAGES}"
-                
             for page in pdf.pages:
                 extracted = page.extract_text()
                 if not extracted:
                     return "Could not extract text from PDF. Please ensure it's not a scanned document."
                 text += extracted + "\n"
         
-        # Validate extracted content
         is_valid, error = validate_pdf_content(text)
         if not is_valid:
             return error

@@ -1,5 +1,24 @@
-streamlit>=1.42.0
-st-supabase-connection>=2.0.1
+# requirements.txt
+
+# --- Core Web Framework ---
+# For building and running the API server
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+
+# --- AI & PDF Processing ---
+# For connecting to the Groq AI service and processing PDFs
 groq>=0.18.0
 pdfplumber>=0.11.5
+
+# --- Database & Authentication ---
+# For connecting to your Supabase backend
+supabase>=2.4.0
+
+# --- Data Validation & Environment ---
+# For data validation in FastAPI and managing environment variables
+pydantic[email]>=2.7.1
+python-dotenv>=1.0.1
+
+# --- File Handling ---
+# For validating file types during upload
 filetype>=1.2.0

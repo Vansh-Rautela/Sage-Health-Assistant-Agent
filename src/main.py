@@ -5,6 +5,8 @@ from components.sidebar import show_sidebar
 from components.analysis_form import show_analysis_form
 from components.footer import show_footer
 from config.app_config import APP_NAME, APP_TAGLINE, APP_DESCRIPTION, APP_ICON
+from services.ai_service import generate_analysis
+from config.prompts import SPECIALIST_PROMPTS
 
 # Must be the first Streamlit command
 st.set_page_config(
@@ -49,17 +51,19 @@ def show_welcome_screen():
             else:
                 st.error("Failed to create session")
 
+
 def show_chat_history():
-    success, messages = st.session_state.auth_service.get_session_messages(
-        st.session_state.current_session['id']
-    )
-    
-    if success:
-        for msg in messages:
-            if msg['role'] == 'user':
-                st.info(msg['content'])
-            else:
-                st.success(msg['content'])
+    # This function now returns the messages for use in the main loop
+    if 'current_session' in st.session_state and st.session_state.current_session:
+        success, messages = st.session_state.auth_service.get_session_messages(
+            st.session_state.current_session['id']
+        )
+        if success:
+            for msg in messages:
+                with st.chat_message(msg['role']):
+                    st.markdown(msg['content'])
+            return messages
+    return []
 
 def show_user_greeting():
     if st.session_state.user:
@@ -79,17 +83,47 @@ def main():
         show_footer()
         return
 
-    # Show user greeting at the top
     show_user_greeting()
-    
-    # Show sidebar
     show_sidebar()
 
-    # Main chat area
     if st.session_state.get('current_session'):
         st.title(f"📊 {st.session_state.current_session['title']}")
-        show_chat_history()
-        show_analysis_form()
+        
+        messages = show_chat_history()
+        
+        if not messages:
+            show_analysis_form()
+        
+        if prompt := st.chat_input("Ask a follow-up question about your report..."):
+            st.session_state.auth_service.save_chat_message(
+                st.session_state.current_session['id'],
+                prompt,
+                role='user'
+            )
+            with st.chat_message("user"):
+                st.markdown(prompt)
+
+            with st.chat_message("assistant"):
+                with st.spinner("Thinking..."):
+                    # --- THIS IS THE FIX ---
+                    # For follow-ups, we now send only the user's prompt.
+                    # The `analysis_agent` will be responsible for retrieving the full context.
+                    response = generate_analysis(
+                        data=prompt,
+                        system_prompt=SPECIALIST_PROMPTS["comprehensive_analyst"],
+                        session_id=st.session_state.current_session['id']
+                    )
+                    # --- END OF FIX ---
+
+                    if response["success"]:
+                        st.markdown(response["content"])
+                        st.session_state.auth_service.save_chat_message(
+                            st.session_state.current_session['id'],
+                            response["content"],
+                            role='assistant'
+                        )
+                    else:
+                        st.error(response["error"])
     else:
         show_welcome_screen()
 

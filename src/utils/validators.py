@@ -1,5 +1,7 @@
 import re
-from config.app_config import MAX_UPLOAD_SIZE_MB
+# --- THE FIX: Changed relative import to absolute ---
+from src.config.app_config import MAX_UPLOAD_SIZE_MB
+# --- END OF FIX ---
 
 def validate_password(password):
     """Validate password meets security requirements."""
@@ -40,12 +42,10 @@ def validate_pdf_file(file):
     if not file:
         return False, "No file uploaded"
         
-    # Check file size
     file_size_mb = file.size / (1024 * 1024)
     if file_size_mb > MAX_UPLOAD_SIZE_MB:
         return False, f"File size ({file_size_mb:.1f}MB) exceeds the {MAX_UPLOAD_SIZE_MB}MB limit"
         
-    # Check file type
     if file.type != 'application/pdf':
         return False, "Invalid file type. Please upload a PDF file"
         
@@ -53,18 +53,15 @@ def validate_pdf_file(file):
 
 def validate_pdf_content(text):
     """Validate if the PDF content appears to be a medical report."""
-    # Common medical report indicators
     medical_terms = [
         'blood', 'test', 'report', 'laboratory', 'lab', 'patient', 'specimen',
         'reference range', 'analysis', 'results', 'medical', 'diagnostic',
         'hemoglobin', 'wbc', 'rbc', 'platelet', 'glucose', 'creatinine'
     ]
     
-    # Validate minimum text length
     if len(text.strip()) < 50:
         return False, "Extracted text is too short. Please ensure the PDF contains valid text."
     
-    # Check for medical terms
     text_lower = text.lower()
     term_matches = sum(1 for term in medical_terms if term in text_lower)
     
