@@ -2,7 +2,7 @@ import uvicorn
 import sys
 import os
 import json
-import re # Import the regular expression module
+import re
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
@@ -12,7 +12,10 @@ from dotenv import load_dotenv
 # Add the project root to the Python path to resolve src imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '.')))
 
-load_dotenv()
+# Explicitly load the .env file from the project's root directory
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path=dotenv_path)
 
 from src.auth.auth_service import AuthService
 from src.agents.analysis_agent import AnalysisAgent
@@ -21,17 +24,19 @@ from src.config.prompts import SPECIALIST_PROMPTS
 
 # --- FastAPI App Initialization ---
 app = FastAPI(
-    title="Health Insights Agent (HIA) API",
+    title="Sage API",
     description="API for analyzing medical reports and managing user sessions.",
     version="1.0.0",
 )
-# Get the Vercel URL from an environment variable for flexibility
+
+# --- Robust CORS Configuration ---
+# Get the Vercel URL from an environment variable for flexibility.
 VERCEL_FRONTEND_URL = os.environ.get("VERCEL_FRONTEND_URL")
 
 origins = [
     "http://localhost:3000",  # For local development
 ]
-# Add the Vercel URL to the list if it's set
+# Add the Vercel URL to the list only if it's set
 if VERCEL_FRONTEND_URL:
     origins.append(VERCEL_FRONTEND_URL)
 
@@ -42,6 +47,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 # --- Service Instances ---
 auth_service = AuthService()
 analysis_agent = AnalysisAgent()
@@ -160,8 +166,6 @@ async def analyze_followup(payload: FollowUpRequest):
 
 @app.post("/analyze/risk-score", summary="Generate personalized health risk scores")
 async def analyze_risk_score(payload: RiskScoreRequest):
-    # --- THIS IS THE FIX ---
-    # This block now handles both AI failures and malformed JSON responses gracefully.
     try:
         result = analysis_agent.analyze_report(
             data=payload.report_context,
@@ -173,11 +177,9 @@ async def analyze_risk_score(payload: RiskScoreRequest):
         content = result["content"]
         
         try:
-            # First, try to parse the content directly
             risk_scores = json.loads(content)
             return risk_scores
         except json.JSONDecodeError:
-            # If parsing fails, try to extract the JSON object from the text
             json_match = re.search(r'\{.*\}', content, re.DOTALL)
             if json_match:
                 json_str = json_match.group(0)
@@ -190,9 +192,7 @@ async def analyze_risk_score(payload: RiskScoreRequest):
                 raise HTTPException(status_code=500, detail="AI did not return a valid JSON object.")
 
     except Exception as e:
-        # Catch any other unexpected errors
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
-    # --- END OF FIX ---
 
 if __name__ == "__main__":
     uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=True)
