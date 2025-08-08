@@ -21,7 +21,7 @@ from src.config.prompts import SPECIALIST_PROMPTS
 
 # --- FastAPI App Initialization ---
 app = FastAPI(
-    title="Sage API",
+    title="Health Insights Agent (HIA) API",
     description="API for analyzing medical reports and managing user sessions.",
     version="1.0.0",
 )
@@ -189,4 +189,3 @@ async def analyze_risk_score(payload: RiskScoreRequest):
 
 if __name__ == "__main__":
     uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=True)
-re

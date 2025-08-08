@@ -58,7 +58,7 @@
     -   Navigate to the `frontend` directory, install dependencies, and run the development server:
         ```bash
         cd frontend
-        npm install --legacy-peer-deps
+       
         npm run dev
         ```
     -   The frontend will be available at `http://localhost:3000`.

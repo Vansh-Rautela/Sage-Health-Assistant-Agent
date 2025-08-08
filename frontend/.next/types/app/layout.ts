@@ -1,4 +1,4 @@
-// File: /home/v4/hia/frontend/app/layout.tsx
+// File: /home/v4/Sage : Health Agent'/frontend/app/layout.tsx
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

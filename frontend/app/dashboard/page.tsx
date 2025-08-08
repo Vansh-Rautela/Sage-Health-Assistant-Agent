@@ -11,34 +11,11 @@ import RiskScoreDisplay from '@/components/dashboard/risk-score-display'
 const API_URL = 'http://localhost:8000';
 
 // --- Interfaces ---
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
-interface Message {
-  id: string;
-  content: string;
-  role: 'user' | 'assistant';
-  timestamp: string;
-}
-interface RiskScore {
-  score: number;
-  justification: string;
-}
-interface RiskData {
-  cardiovascular: RiskScore;
-  diabetes: RiskScore;
-  liver: RiskScore;
-}
-interface Session {
-  id: string;
-  title: string;
-  createdAt: string;
-  messages: Message[];
-  reportContext?: any;
-  riskData?: RiskData;
-}
+interface User { id: string; name: string; email: string; }
+interface Message { id: string; content: string; role: 'user' | 'assistant'; timestamp: string; }
+interface RiskScore { score: number; justification: string; }
+interface RiskData { cardiovascular: RiskScore; diabetes: RiskScore; liver: RiskScore; }
+interface Session { id: string; title: string; createdAt: string; messages: Message[]; reportContext?: any; riskData?: RiskData; }
 type ViewState = 'welcome' | 'analysis-form' | 'chat';
 
 export default function DashboardPage() {
@@ -210,7 +187,7 @@ export default function DashboardPage() {
     } catch (error: any) {
         setError(error.message);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
   
@@ -220,7 +197,6 @@ export default function DashboardPage() {
       router.push('/auth');
   };
 
-  // --- THE FIX: Simplified render logic to remove duplicate chat input ---
   const renderMainContent = () => {
     switch (viewState) {
       case 'welcome':
@@ -240,7 +216,6 @@ export default function DashboardPage() {
         return <WelcomeState onNewSession={handleNewSession} />;
     }
   };
-  // --- END OF FIX ---
 
   return (
     <div className="h-screen bg-white flex border-4 border-black">

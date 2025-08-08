@@ -110,3 +110,4 @@ class ModelManager:
             return self.generate_analysis(data, system_prompt, retry_count + 1)
             
         return {"success": False, "error": "Analysis failed with all available models"}
+    

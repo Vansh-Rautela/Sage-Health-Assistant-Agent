@@ -1,4 +1,4 @@
-// File: /home/v4/hia/frontend/app/auth/page.tsx
+// File: /home/v4/Sage : Health Agent'/frontend/app/auth/page.tsx
 import * as entry from '../../../../app/auth/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
