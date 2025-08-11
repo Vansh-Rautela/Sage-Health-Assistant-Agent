@@ -1,19 +1,14 @@
 import os
 import re
-import time # Import the time module
+import time 
 from datetime import datetime
 from supabase import create_client, Client
 import logging
 
-# Configure basic logging to help with future debugging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class AuthService:
     def __init__(self):
-        """
-        Initializes the AuthService, connecting to Supabase using credentials
-        from environment variables loaded from the .env file.
-        """
         try:
             url = os.environ.get("SUPABASE_URL")
             key = os.environ.get("SUPABASE_KEY")
@@ -27,26 +22,49 @@ class AuthService:
 
     def sign_up(self, email, password, name):
         """
-        Signs up a new user. The user profile is created automatically in the
-        public.users table by a database trigger.
+        Signs up a new user in the auth schema and then explicitly creates their
+        profile in the public.users table.
         """
         try:
-            res = self.supabase.auth.sign_up({
+            # Step 1: Create the user in the authentication system
+            auth_response = self.supabase.auth.sign_up({
                 "email": email,
                 "password": password,
                 "options": {"data": {"name": name}}
             })
-            if not res.user:
-                return False, "Failed to create user in auth schema"
 
-            # The database trigger handles creating the public user profile.
-            # We just return the user info upon successful auth creation.
-            return True, {"id": res.user.id, "email": res.user.email, "name": name}
+            if not auth_response.user:
+                error_detail = "Failed to create user in auth schema. The user may already exist or the password may be too weak."
+                return False, error_detail
+
+            new_user = auth_response.user
+
+            # --- THIS IS THE NEW, DEFINITIVE FIX ---
+            # Step 2: Explicitly insert the user profile into the public.users table.
+            # This replaces the unreliable database trigger.
+            profile_data = {
+                'id': new_user.id,
+                'email': new_user.email,
+                'name': name
+            }
+            
+            insert_response = self.supabase.table('users').insert(profile_data).execute()
+
+            if not insert_response.data:
+                logging.error(f"Failed to create user profile for {new_user.id} after signup.")
+                return False, "Could not create user profile. Please try again."
+            # --- END OF FIX ---
+
+            logging.info(f"Successfully created user and profile for {new_user.email}")
+            return True, {"id": new_user.id, "email": new_user.email, "name": name}
+
         except Exception as e:
-            error_msg = str(e).lower()
-            if "duplicate key value" in error_msg or "already registered" in error_msg:
+            error_msg = str(e)
+            logging.error(f"An exception occurred during signup: {error_msg}")
+            if "duplicate key value" in error_msg.lower() or "already registered" in error_msg.lower():
                 return False, "Email already registered"
-            return False, f"Sign up failed: {str(e)}"
+            return False, f"Sign up failed: {error_msg}"
+
 
     def sign_in(self, email, password):
         """Signs in a user and returns their data along with a session token."""
@@ -55,21 +73,13 @@ class AuthService:
             if not res.user or not res.session:
                 return False, "Invalid login credentials"
 
-            # --- THIS IS THE FIX ---
-            # Implement a retry mechanism to handle the race condition where the
-            # database trigger might be slow to create the user profile.
-            user_data = None
-            for attempt in range(4): # Try up to 4 times (total of ~3 seconds)
-                user_data = self.get_user_data(res.user.id)
-                if user_data:
-                    break
-                time.sleep(1) # Wait for 1 second before retrying
-            # --- END OF FIX ---
+            # The retry logic is no longer needed here because the signup function
+            # now guarantees the profile exists before it returns success.
+            user_data = self.get_user_data(res.user.id)
 
             if not user_data:
-                return False, "User data not found. Please ensure your account is confirmed."
+                return False, "User data not found. Please try signing up again."
 
-            # Attach the token for the frontend to store
             user_data["token"] = res.session.access_token
             return True, user_data
         except Exception:
@@ -83,9 +93,10 @@ class AuthService:
         except Exception as e:
             logging.error(f"Error fetching user data for {user_id}: {e}")
             return None
+            
+    # --- No changes to the functions below this line ---
 
     def create_session(self, user_id, title=None):
-        """Creates a new chat session for a given user."""
         try:
             current_time = datetime.now()
             default_title = f"{current_time.strftime('%d-%m-%Y')} | {current_time.strftime('%H:%M:%S')}"
@@ -101,7 +112,6 @@ class AuthService:
             return False, str(e)
 
     def get_user_sessions(self, user_id):
-        """Retrieves all chat sessions for a given user."""
         try:
             result = self.supabase.table('chat_sessions').select('*').eq('user_id', user_id).order('created_at', desc=True).execute()
             return True, result.data
@@ -110,7 +120,6 @@ class AuthService:
             return False, []
 
     def save_chat_message(self, session_id, content, role='user'):
-        """Saves a chat message to a specific session."""
         try:
             message_data = {
                 'session_id': session_id,
@@ -125,7 +134,6 @@ class AuthService:
             return False, str(e)
 
     def get_session_messages(self, session_id):
-        """Retrieves all messages for a specific session."""
         try:
             result = self.supabase.table('chat_messages').select('*').eq('session_id', session_id).order('created_at').execute()
             return True, result.data
@@ -134,7 +142,6 @@ class AuthService:
             return False, []
 
     def delete_session(self, session_id):
-        """Deletes a session and all associated messages."""
         try:
             self.supabase.table('chat_messages').delete().eq('session_id', session_id).execute()
             self.supabase.table('chat_sessions').delete().eq('id', session_id).execute()

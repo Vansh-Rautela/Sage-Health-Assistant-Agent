@@ -62,19 +62,14 @@ export default function AuthPage() {
         throw new Error(errData.detail || 'Signup failed');
       }
 
-      // --- THIS IS THE FIX ---
-      // We wait for 2 seconds to give the database trigger time to run
-      // before we try to log in the new user. This prevents the race condition.
-      setTimeout(() => {
-        handleLogin(email, password);
-      }, 2000); // 2000 milliseconds = 2 seconds
-      // --- END OF FIX ---
+      // With the backend fix, we can now reliably and immediately log the user in.
+      await handleLogin(email, password);
 
     } catch (error: any) {
       setError(error.message);
-      setIsLoading(false); // Ensure loading stops if the signup itself fails
-    } 
-    // No 'finally' block here, as handleLogin will manage the isLoading state.
+      // Ensure loading stops if the signup itself fails before login is attempted
+      setIsLoading(false); 
+    }
   };
 
   return (
