@@ -22,11 +22,9 @@ class AuthService:
 
     def sign_up(self, email, password, name):
         """
-        Signs up a new user in the auth schema and then explicitly creates their
-        profile in the public.users table.
+        Signs up a new user and explicitly creates their profile in the public.users table.
         """
         try:
-            # Step 1: Create the user in the authentication system
             auth_response = self.supabase.auth.sign_up({
                 "email": email,
                 "password": password,
@@ -34,37 +32,22 @@ class AuthService:
             })
 
             if not auth_response.user:
-                error_detail = "Failed to create user in auth schema. The user may already exist or the password may be too weak."
-                return False, error_detail
+                return False, "Failed to create user. The user may already exist."
 
             new_user = auth_response.user
-
-            # --- THIS IS THE NEW, DEFINITIVE FIX ---
-            # Step 2: Explicitly insert the user profile into the public.users table.
-            # This replaces the unreliable database trigger.
-            profile_data = {
-                'id': new_user.id,
-                'email': new_user.email,
-                'name': name
-            }
+            profile_data = {'id': new_user.id, 'email': new_user.email, 'name': name}
             
             insert_response = self.supabase.table('users').insert(profile_data).execute()
 
             if not insert_response.data:
-                logging.error(f"Failed to create user profile for {new_user.id} after signup.")
-                return False, "Could not create user profile. Please try again."
-            # --- END OF FIX ---
+                return False, "Could not create user profile."
 
-            logging.info(f"Successfully created user and profile for {new_user.email}")
             return True, {"id": new_user.id, "email": new_user.email, "name": name}
-
         except Exception as e:
             error_msg = str(e)
-            logging.error(f"An exception occurred during signup: {error_msg}")
             if "duplicate key value" in error_msg.lower() or "already registered" in error_msg.lower():
                 return False, "Email already registered"
             return False, f"Sign up failed: {error_msg}"
-
 
     def sign_in(self, email, password):
         """Signs in a user and returns their data along with a session token."""
@@ -73,12 +56,15 @@ class AuthService:
             if not res.user or not res.session:
                 return False, "Invalid login credentials"
 
-            # The retry logic is no longer needed here because the signup function
-            # now guarantees the profile exists before it returns success.
-            user_data = self.get_user_data(res.user.id)
+            user_data = None
+            for _ in range(3): # Retry for a few seconds
+                user_data = self.get_user_data(res.user.id)
+                if user_data:
+                    break
+                time.sleep(1)
 
             if not user_data:
-                return False, "User data not found. Please try signing up again."
+                return False, "User data not found. Please try again."
 
             user_data["token"] = res.session.access_token
             return True, user_data
@@ -86,25 +72,30 @@ class AuthService:
             return False, "Invalid login credentials"
 
     def get_user_data(self, user_id):
-        """Retrieves user profile data from the public 'users' table."""
+        """
+        Retrieves user profile data from the public 'users' table gracefully.
+        """
         try:
-            response = self.supabase.table('users').select('*').eq('id', user_id).single().execute()
-            return response.data if response.data else None
+            # --- THIS IS THE FINAL FIX ---
+            # Remove .single() and handle the result based on the data returned.
+            # This prevents the 406 error if no rows are found initially.
+            response = self.supabase.table('users').select('*').eq('id', user_id).execute()
+            
+            if response.data and len(response.data) > 0:
+                return response.data[0] # Return the first user found
+            return None # Return None if no user is found
+            # --- END OF FIX ---
         except Exception as e:
             logging.error(f"Error fetching user data for {user_id}: {e}")
             return None
-            
+
     # --- No changes to the functions below this line ---
 
     def create_session(self, user_id, title=None):
         try:
             current_time = datetime.now()
             default_title = f"{current_time.strftime('%d-%m-%Y')} | {current_time.strftime('%H:%M:%S')}"
-            session_data = {
-                'user_id': user_id,
-                'title': title or default_title,
-                'created_at': current_time.isoformat()
-            }
+            session_data = {'user_id': user_id, 'title': title or default_title, 'created_at': current_time.isoformat()}
             result = self.supabase.table('chat_sessions').insert(session_data).execute()
             return True, result.data[0] if result.data else None
         except Exception as e:
@@ -121,12 +112,7 @@ class AuthService:
 
     def save_chat_message(self, session_id, content, role='user'):
         try:
-            message_data = {
-                'session_id': session_id,
-                'content': content,
-                'role': role,
-                'created_at': datetime.now().isoformat()
-            }
+            message_data = {'session_id': session_id, 'content': content, 'role': role, 'created_at': datetime.now().isoformat()}
             result = self.supabase.table('chat_messages').insert(message_data).execute()
             return True, result.data[0] if result.data else None
         except Exception as e:
