@@ -1,5 +1,6 @@
 import os
 import re
+import time # Import the time module
 from datetime import datetime
 from supabase import create_client, Client
 import logging
@@ -54,12 +55,16 @@ class AuthService:
             if not res.user or not res.session:
                 return False, "Invalid login credentials"
 
-            user_data = self.get_user_data(res.user.id)
-            if not user_data:
-                # This handles the rare case where the db trigger is slow.
-                import time
-                time.sleep(1)
+            # --- THIS IS THE FIX ---
+            # Implement a retry mechanism to handle the race condition where the
+            # database trigger might be slow to create the user profile.
+            user_data = None
+            for attempt in range(4): # Try up to 4 times (total of ~3 seconds)
                 user_data = self.get_user_data(res.user.id)
+                if user_data:
+                    break
+                time.sleep(1) # Wait for 1 second before retrying
+            # --- END OF FIX ---
 
             if not user_data:
                 return False, "User data not found. Please ensure your account is confirmed."
