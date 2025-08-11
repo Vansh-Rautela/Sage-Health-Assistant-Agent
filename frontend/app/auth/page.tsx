@@ -7,13 +7,11 @@ import LoginForm from '@/components/auth/login-form'
 import SignupForm from '@/components/auth/signup-form'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // --- THIS IS THE FIX: New state to handle the success message ---
-  const [signupSuccess, setSignupSuccess] = useState(false);
-  // --- END OF FIX ---
   const router = useRouter();
 
   const handleLogin = async (email: string, password: string) => {
@@ -28,7 +26,7 @@ export default function AuthPage() {
 
       if (!response.ok) {
         const errData = await response.json();
-        throw new Error(errData.detail || 'Login failed. Have you confirmed your email?');
+        throw new Error(errData.detail || 'Login failed. Please check your credentials.');
       }
 
       const data = await response.json();
@@ -51,7 +49,7 @@ export default function AuthPage() {
 
     setIsLoading(true);
     setError(null);
-    setSignupSuccess(false);
+    
     try {
       const response = await fetch(`${API_URL}/signup`, {
         method: 'POST',
@@ -64,43 +62,23 @@ export default function AuthPage() {
         throw new Error(errData.detail || 'Signup failed');
       }
 
-      // --- THIS IS THE FIX: Show success message instead of auto-login ---
-      setSignupSuccess(true);
+      // --- THIS IS THE FIX ---
+      // We wait for 2 seconds to give the database trigger time to run
+      // before we try to log in the new user. This prevents the race condition.
+      setTimeout(() => {
+        handleLogin(email, password);
+      }, 2000); // 2000 milliseconds = 2 seconds
       // --- END OF FIX ---
 
     } catch (error: any) {
       setError(error.message);
-    } finally {
-      setIsLoading(false);
-    }
+      setIsLoading(false); // Ensure loading stops if the signup itself fails
+    } 
+    // No 'finally' block here, as handleLogin will manage the isLoading state.
   };
 
-  // --- THIS IS THE FIX: New component to show the verification message ---
-  if (signupSuccess) {
-    return (
-      <AuthLayout title="Check Your Email">
-        <div className="text-center">
-          <p className="text-lg font-bold text-gray-700">
-            A confirmation link has been sent to your email address.
-          </p>
-          <p className="mt-4">Please click the link to verify your account before logging in.</p>
-          <button
-            onClick={() => {
-              setSignupSuccess(false);
-              setIsLogin(true);
-            }}
-            className="w-full neo-button mt-6 py-4 px-6"
-          >
-            Back to Login
-          </button>
-        </div>
-      </AuthLayout>
-    );
-  }
-  // --- END OF FIX ---
-
   return (
-    <AuthLayout title={isLogin ? 'Welcome Back!' : 'Welcome!'}>
+    <AuthLayout title={isLogin ? 'Welcome Back!' : 'Create Your Account'}>
       {isLogin ? (
         <LoginForm
           onToggleForm={() => setIsLogin(false)}
