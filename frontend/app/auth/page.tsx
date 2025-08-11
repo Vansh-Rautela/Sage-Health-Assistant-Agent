@@ -62,7 +62,6 @@ export default function AuthPage() {
         throw new Error(errData.detail || 'Signup failed');
       }
 
-      // With the backend now fully robust, we can confidently call login immediately.
       await handleLogin(email, password);
 
     } catch (error: any) {

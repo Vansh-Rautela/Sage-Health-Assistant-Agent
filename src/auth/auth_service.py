@@ -50,18 +50,23 @@ class AuthService:
             return False, f"Sign up failed: {error_msg}"
 
     def sign_in(self, email, password):
-        """Signs in a user and returns their data along with a session token."""
+        """
+        Signs in a user and returns their data, retrying if the user profile is not immediately available.
+        """
         try:
             res = self.supabase.auth.sign_in_with_password({"email": email, "password": password})
             if not res.user or not res.session:
                 return False, "Invalid login credentials"
 
+            # --- THIS IS THE FINAL, COMBINED FIX ---
+            # Implement a robust retry mechanism to handle any replication delay.
             user_data = None
-            for _ in range(3): # Retry for a few seconds
+            for attempt in range(4): # Try up to 4 times (total of ~3 seconds)
                 user_data = self.get_user_data(res.user.id)
                 if user_data:
                     break
-                time.sleep(1)
+                time.sleep(1) # Wait for 1 second before retrying
+            # --- END OF FIX ---
 
             if not user_data:
                 return False, "User data not found. Please try again."
@@ -73,22 +78,18 @@ class AuthService:
 
     def get_user_data(self, user_id):
         """
-        Retrieves user profile data from the public 'users' table gracefully.
+        Retrieves user profile data gracefully, without using .single().
         """
         try:
-            # --- THIS IS THE FINAL FIX ---
-            # Remove .single() and handle the result based on the data returned.
-            # This prevents the 406 error if no rows are found initially.
             response = self.supabase.table('users').select('*').eq('id', user_id).execute()
             
             if response.data and len(response.data) > 0:
                 return response.data[0] # Return the first user found
             return None # Return None if no user is found
-            # --- END OF FIX ---
         except Exception as e:
             logging.error(f"Error fetching user data for {user_id}: {e}")
             return None
-
+            
     # --- No changes to the functions below this line ---
 
     def create_session(self, user_id, title=None):
